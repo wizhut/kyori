@@ -1,0 +1,15 @@
+{
+    "name": "kyori",
+    "version": "0.0.1",
+    "description": "yet another string edit distance library",
+    "main": "src/index.js",
+    "scripts": {
+      "test": "node test/index.test.js"
+    },
+    "devDependencies": {
+        "tap": "21.0.1"
+    },
+    "keywords": ["string distance"],
+    "author": "Vassilios Karakoidas <vassilios.karakoidas@weizhut.tech>",
+    "license": "MIT"
+  }
