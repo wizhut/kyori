@@ -4,7 +4,7 @@
     "description": "yet another string edit distance library",
     "main": "src/index.js",
     "scripts": {
-      "test": "node test/index.test.js"
+      "test": "tap run"
     },
     "devDependencies": {
         "tap": "21.0.1"
