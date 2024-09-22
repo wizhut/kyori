@@ -3,6 +3,4 @@ function kyoriDistance(needle, haystack) {
 }
 
 
-export default {
-    kyoriDistance
-};
+module.exports = kyoriDistance;
