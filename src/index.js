@@ -1,5 +1,11 @@
 function kyoriDistance(needle, haystack) {
-    return 0;
+    if (needle === haystack) {
+        return 0;
+    }
+
+    let score = 0;
+
+    return score;
 }
 
 
