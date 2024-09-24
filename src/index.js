@@ -7,9 +7,9 @@ function keyowrd_distance(terms, text) {
     }
 
     // tokenize
+    const termTokens = tokenize_term(terms);
 
-
-    // penalize
+    // penalize with range
     let score = Math.abs(haystack - needle);
 
     return score;
