@@ -1,4 +1,9 @@
-# Kyori - Yet another string distance algorithm
+# Kyori
+
+A library that offers many algorithms to calculate string edit distance.
+In addition, it offers the Kyori algorithm, a simple-yet-nice approach to rank
+several results against a set of terms (keywords). It is handy when you have search 
+results and you want to return the most lexicographically relevant.
 
 In Japanese, the word for “distance” is 距離 pronounced as **kyori** (きょり).
 
