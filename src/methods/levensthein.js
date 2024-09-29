@@ -14,7 +14,7 @@ function fl_closest() {
 
 
 module.exports = {
-    levenshtein: {
+    levensthein: {
         distance: fl_distance,
         closest: fl_closest
     }
