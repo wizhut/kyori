@@ -4,15 +4,20 @@
     "description": "yet another string edit distance library",
     "main": "src/index.js",
     "scripts": {
-      "test": "tap run"
+        "test": "tap run"
     },
     "dependendies": {
-        "fastest-levenshtein": "1.0.16"
+        "fastest-levensthein": "1.0.16"
     },
     "devDependencies": {
         "tap": "21.0.1"
     },
-    "keywords": ["string distance"],
+    "keywords": [
+        "string distance"
+    ],
     "author": "Vassilios Karakoidas <vassilios.karakoidas@weizhut.tech>",
-    "license": "MIT"
-  }
+    "license": "MIT",
+    "dependencies": {
+        "fastest-levenshtein": "^1.0.16"
+    }
+}
