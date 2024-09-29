@@ -33,7 +33,5 @@ Using the library is also straightforward. First, you must include the kyori mod
 
 ```javascript
 const kyori = require('kyori');
-
-kyori('foo', 'foo') // => this return 0, which means the strings are identical
 ```
 
