@@ -1,7 +1,7 @@
 const { tokenize_term } = require('./tokenize.js');
 
 
-function keyowrd_distance(terms, text) {
+function keyword_distance(terms, text) {
     if (terms === text) {
         return 0;
     }
@@ -26,13 +26,7 @@ function text_distance(term, text) {
 }
 
 
-function equals(needle, haystack) {
-    return keyowrd_distance(needle, haystack) === 0;
-}
-
-
 module.exports = {
-    keyowrd_distance,
-    text_distance,
-    equals
+    keyword_distance,
+    text_distance
 };
