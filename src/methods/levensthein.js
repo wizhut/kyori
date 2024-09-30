@@ -1,7 +1,7 @@
 /*
 wrapper for https://www.npmjs.com/package/fastest-levenshtein
  */
-const { distance, closest } = require('fastest-levenshtein')
+const levensthein = require('talisman/metrics/levenshtein');
 const { isNil } = require('../libs/lang.js');
 
 
@@ -10,21 +10,12 @@ function fl_distance(terms, text) {
         return -1;
     }
 
-    return distance(terms, text);
-}
-
-function fl_closest(terms, arrayOfText) {
-    if (isNil(terms) || isNil(arrayOfText)) {
-        return null;
-    }
-
-    return closest(terms, arrayOfText);
+    return levensthein(terms, text);
 }
 
 
 module.exports = {
     levensthein: {
-        distance: fl_distance,
-        closest: fl_closest
+        distance: fl_distance
     }
 };
