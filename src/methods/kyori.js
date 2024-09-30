@@ -28,7 +28,9 @@ function text_distance(term, text) {
 
 module.exports = {
     kyori: {
-        keyword_distance: keyword_distance,
-        text_distance: text_distance
+        distance: {
+            keyword: keyword_distance,
+            text: text_distance
+        }
     }
 }
