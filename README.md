@@ -90,6 +90,7 @@ const { jaro_winkler } = require('kyori');
 
 ```javascript
 jaro_winkler.distance('foo', 'foo') // should be 1
+jaro_winkler.distance('foo', 'bar') // should be 0
 ```
 
 ### Kyori
