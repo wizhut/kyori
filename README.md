@@ -38,15 +38,31 @@ library will be used as a dependency, but since it has not been updated for 3-4 
 
 ## Usage
 
-Using the library is also straightforward. First, you must include the kyori module,
+Using the library is also straightforward. First, you must include the top-level kyori module,
 
 ```javascript
 const kyori = require('kyori');
 ```
 
+the object is structured as followed:
+
+```text
+{
+    kyori: {
+        levensthein: distance(),
+        damerau_levensthein: distance(),
+        hamming: distance(),
+        jaro_winkler: distance(),
+        ...
+    }
+}
+```
+
 and then call the appropriate method you want to use. You can also include the desired method directly.
 
 ### Levensthein
+
+Definition can be found [here](https://en.wikipedia.org/wiki/Levenshtein_distance) ↗.
 
 ```javascript
 const { levensthein } = require('kyori');
@@ -62,6 +78,8 @@ levensthein.distance('foo', null)   // should be -1
 
 ### Damerau-Levensthein
 
+Definition can be found [here](https://en.wikipedia.org/wiki/Damerau–Levenshtein_distance) ↗.
+
 ```javascript
 const { damerau_levensthein } = require('kyori');
 ```
@@ -75,6 +93,8 @@ damerau_levensthein.distance('foo', 'foodo'); // should be 2
 ```
 
 ### Hamming distance
+
+Definition can be found [here](https://en.wikipedia.org/wiki/Hamming_distance) ↗.
 
 ```javascript
 const { hamming } = require('kyori');
