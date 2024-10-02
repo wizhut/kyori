@@ -68,3 +68,4 @@ levensthein.distance('foo', null)   // should be -1
 
 ### Kyori
 
+**Not implemented yet**
