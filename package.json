@@ -13,7 +13,7 @@
         "tap": "21.0.1"
     },
     "keywords": [
-        "string distance"
+        "string distance", "levensthein", "hamming", "jaro_winkler", "damerau-levensthein"
     ],
     "author": "Vassilios Karakoidas <vassilios.karakoidas@weizhut.tech>",
     "license": "MIT"
