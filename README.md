@@ -128,3 +128,7 @@ jaro_winkler.distance('foo', 'bar') // should be 0
 ### Kyori
 
 **Not implemented yet**
+
+# aob
+
+Released under MIT license and maintained by [wizhut.tech](https://www.wizhut.tech) ↗.
