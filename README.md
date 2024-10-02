@@ -52,7 +52,7 @@ and then call the appropriate method you want to use. You can also include the d
 const { levensthein } = require('kyori');
 ```
 
-*Available methods*:
+*Example*:
 
 ```javascript
 levensthein.distance('foo', 'foo')  // should be 0
@@ -64,7 +64,33 @@ levensthein.distance('foo', null)   // should be -1
 
 ### Hamming distance
 
+```javascript
+const { hamming } = require('kyori');
+```
+
+*Usage*:
+
+Keep in mind that hamming distance works only for string with same length.
+
+```javascript
+hamming.distance('foo', 'foo')  // should be 0
+hamming.distance('foo', 'fob')  // should be 1
+hamming.distance('foo', 'food') // should be -1
+```
+
 ### Jaro-Winkler
+
+Definition can be found [here](https://en.wikipedia.org/wiki/Jaro–Winkler_distance) ↗.
+
+```javascript
+const { jaro_winkler } = require('kyori');
+```
+
+*Usage*:
+
+```javascript
+jaro_winkler.distance('foo', 'foo') // should be 1
+```
 
 ### Kyori
 
