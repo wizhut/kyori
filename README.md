@@ -62,6 +62,18 @@ levensthein.distance('foo', null)   // should be -1
 
 ### Damerau-Levensthein
 
+```javascript
+const { damerau_levensthein } = require('kyori');
+```
+
+*Example*:
+
+```javascript
+damerau_levensthein.distance('foo', 'foo');   // should be 0
+damerau_levensthein.distance('foo', 'food');  // should be 1
+damerau_levensthein.distance('foo', 'foodo'); // should be 2
+```
+
 ### Hamming distance
 
 ```javascript
