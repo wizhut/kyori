@@ -26,7 +26,7 @@ It provides support for the following methods:
 * **Jaro-Winkler Distance**: This method is particularly effective for short strings such as names. It calculates a similarity score based on the number and order of common characters, giving higher scores to strings that match from the beginning.
 * **Kyori**: *Work in progress*
 
-Except, *kyori* all the other methods are wrapper on the [talisman library](https://yomguithereal.github.io/talisman/)↗.
+Except, *kyori* all the other methods are wrapper on the [talisman library](https://yomguithereal.github.io/talisman/) ↗.
 
 ## Usage
 
