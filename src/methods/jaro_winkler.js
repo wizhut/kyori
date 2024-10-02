@@ -1,7 +1,7 @@
 const {
     similarity,
     distance
-} = require('talisman/metrics/jaro_winkler');
+} = require('talisman/metrics/jaro-winkler');
 
 
 module.exports = {
