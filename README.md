@@ -26,7 +26,7 @@ It provides support for the following methods:
 * **Kyori**: *Work in progress*
 
 Except, *kyori* all the other methods are wrapper on the [talisman library](https://yomguithereal.github.io/talisman/) ↗. For these early versions, this 
-library will be used as a dependency
+library will be used as a dependency, but since it has not been updated for 3-4 years, it will be replaced in the next versions.
 
 ## Usage
 
@@ -41,7 +41,15 @@ and then call the appropriate method you want to use. You can also include the d
 ### Levensthein
 
 ```javascript
-kyori.distance()
+const { levensthein } = require('kyori');
+```
+
+*Available methods*:
+
+```javascript
+levensthein.distance('foo', 'foo')  // should be 0
+levensthein.distance('foo', 'food') // should be 1
+levensthein.distance('foo', null)   // should be -1
 ```
 
 ### Damerau-Levensthein
