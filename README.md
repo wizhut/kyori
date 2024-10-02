@@ -15,7 +15,15 @@ Installing the library is simple, just run the following command.
 npm install kyori
 ```
 
-## Documentation
+## Run unit tests
+
+To execute locally the testing suite, just execute:
+
+```bash
+npm test
+```
+
+## Implemented methods
 
 It provides support for the following methods:
 
@@ -59,3 +67,4 @@ levensthein.distance('foo', null)   // should be -1
 ### Jaro-Winkler
 
 ### Kyori
+
