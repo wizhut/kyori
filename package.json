@@ -6,8 +6,8 @@
     "scripts": {
         "test": "tap run"
     },
-    "dependendies": {
-        "talisman": "1.1.4"
+    "dependencies": {
+        "talisman": "^1.1.4"
     },
     "devDependencies": {
         "tap": "21.0.1"
@@ -17,8 +17,4 @@
     ],
     "author": "Vassilios Karakoidas <vassilios.karakoidas@weizhut.tech>",
     "license": "MIT",
-    "dependencies": {
-        "fastest-levenshtein": "^1.0.16",
-        "talisman": "^1.1.4"
-    }
 }
