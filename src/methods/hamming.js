@@ -1,6 +1,11 @@
+const { allAreNotNil } = require('../libs/lang.js');
 
 
 function fn_hamming(term, text) {
+    if (!allAreNotNil([term, text])) {
+        return -1;
+    }
+
     if (term.length !== text.length) {
         return -1;
     }
