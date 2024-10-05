@@ -1,5 +1,5 @@
 {
-    "name": "kyori",
+    "name": "@wizhut_tech/kyori",
     "version": "0.0.3",
     "description": "yet another string edit distance library",
     "main": "src/index.js",
@@ -7,14 +7,26 @@
         "test": "tap run"
     },
     "dependencies": {
-        "talisman": "^1.1.4"
+        "talisman": "1.1.4"
     },
     "devDependencies": {
         "tap": "21.0.1"
     },
     "keywords": [
-        "string distance", "levensthein", "hamming", "jaro_winkler", "damerau-levensthein"
+        "string distance",
+        "levensthein",
+        "hamming",
+        "jaro_winkler",
+        "damerau-levensthein"
     ],
     "author": "Vassilios Karakoidas <vassilios.karakoidas@weizhut.tech>",
-    "license": "MIT"
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/wizhut/kyori.git"
+    },
+    "bugs": {
+        "url": "https://github.com/wizhut/kyori/issues"
+    },
+    "homepage": "https://github.com/wizhut/kyori#readme"
 }
