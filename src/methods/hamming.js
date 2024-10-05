@@ -1,12 +1,19 @@
-const hamming = require('talisman/metrics/hamming.js');
 
 
 function fn_hamming(term, text) {
-    try {
-        return hamming(term, text);
-    } catch(e) {
+    if (term.length !== text.length) {
         return -1;
     }
+
+    let diff = 0;
+
+    for (let i = 0; i < text.length; i++) {
+        if (term[i] !== text[i]) {
+            diff += 1;
+        }
+    }
+
+    return diff;
 }
 
 

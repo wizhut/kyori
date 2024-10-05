@@ -1,10 +1,11 @@
 {
     "name": "@wizhut_tech/kyori",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "description": "yet another string edit distance library",
     "main": "src/index.js",
     "scripts": {
-        "test": "tap run"
+        "test": "tap run",
+        "rank-test": "node src/rank_test.js"
     },
     "dependencies": {
         "talisman": "1.1.4"
