@@ -94,7 +94,7 @@ damerau_levensthein.distance('foo', 'foodo'); // should be 2
 
 ### Hamming distance
 
-Definition can be found [here](https://en.wikipedia.org/wiki/Hamming_distance) ↗.
+Definition can be found [here](https://en.wikipedia.org/wiki/Hamming_distance) ↗. This metric is natively implemented.
 
 ```javascript
 const { hamming } = require('kyori');
