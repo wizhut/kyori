@@ -62,7 +62,7 @@ and then call the appropriate method you want to use. You can also include the d
 
 ### Levensthein
 
-Definition can be found [here](https://en.wikipedia.org/wiki/Levenshtein_distance) ↗.
+Definition can be found [here](https://en.wikipedia.org/wiki/Levenshtein_distance) ↗. This metric is also natively implemented.
 
 ```javascript
 const { levensthein } = require('kyori');
