@@ -1,11 +1,30 @@
 const t = require('tap');
 
-const {levensthein} = require('../src/index.js');
+const { levensthein } = require('../src/index.js');
 
 
 t.test('kyori/levensthein/distance', (t) => {
-    t.equal(levensthein.distance('fast', 'fist'), 1);
-    t.equal(levensthein.distance('fast', 'fast'), 0);
+    const tests = [
+        ['', '', 0],
+        ['yo', '', 2],
+        ['', 'yo', 2],
+        ['yo', 'yo', 0],
+        ['tier', 'tor', 2],
+        ['saturday', 'sunday', 3],
+        ['mist', 'dist', 1],
+        ['tier', 'tor', 2],
+        ['kitten', 'sitting', 3],
+        ['stop', 'tops', 2],
+        ['rosettacode', 'raisethysword', 8],
+        ['mississippi', 'swiss miss', 8],
+        ['fast', 'fist', 1],
+        ['fast', 'fast', 0]
+    ];
+
+    for (let test of tests) {
+        t.equal(levensthein.distance(test[0], test[1]), test[2]);
+    }
+
     t.end();
 });
 

@@ -8,6 +8,14 @@ function fl_distance(terms, text) {
 
     let t = [], m = terms.length, n = text.length;
 
+    if (m === 0 && n === 0) {
+        return 0;
+    }
+
+    if (m === 0) {
+        return n;
+    }
+
     for (let j = 0; j <= n; j++) {
         t[j] = j;
     }
@@ -23,7 +31,7 @@ function fl_distance(terms, text) {
 
         t = u;
     }
-    
+
     return u[n];
 }
 
