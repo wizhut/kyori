@@ -18,7 +18,9 @@ t.test('kyori/levensthein/distance', (t) => {
         ['rosettacode', 'raisethysword', 8],
         ['mississippi', 'swiss miss', 8],
         ['fast', 'fist', 1],
-        ['fast', 'fast', 0]
+        ['fast', 'fast', 0],
+        ['uninformed', 'uniformed', 1],
+        ['kitten', 'sitting', 3]
     ];
 
     for (let test of tests) {
