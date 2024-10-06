@@ -8,7 +8,8 @@
         "rank-test": "node src/rank_test.js"
     },
     "dependencies": {
-        "talisman": "1.1.4"
+        "talisman": "1.1.4",
+        "fuzzball": "2.1.3"
     },
     "devDependencies": {
         "tap": "21.0.1"
