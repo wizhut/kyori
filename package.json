@@ -1,7 +1,7 @@
 {
     "name": "@wizhut_tech/kyori",
-    "version": "0.0.8",
-    "description": "yet another string edit distance library",
+    "version": "0.0.9",
+    "description": "A library that focuses on edit distance and similarity algorithms for string",
     "main": "src/index.js",
     "scripts": {
         "test": "tap run",
