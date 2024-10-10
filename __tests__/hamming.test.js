@@ -1,6 +1,6 @@
 const t = require('tap');
 
-const { hamming } = require('../src/methods/hamming.js');
+const { hamming } = require('../src/methods/edit_distance/hamming.js');
 
 
 t.test('kyori/hamming/tests', (t) => {

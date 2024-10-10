@@ -1,6 +1,6 @@
 const t = require('tap');
 
-const { jaro_winkler } = require('../src/methods/jaro_winkler.js');
+const { jaro_winkler } = require('../src/methods/edit_distance/jaro_winkler.js');
 
 
 t.test('kyori/jaro_winkler/tests', (t) => {

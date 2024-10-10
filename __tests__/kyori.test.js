@@ -1,6 +1,6 @@
 const t = require('tap');
 
-const { kyori } = require('../src/methods/kyori.js');
+const { kyori } = require('../src/methods/similarity/kyori.js');
 
 
 t.test('kyori/keyword_distance() tests', (t) => {

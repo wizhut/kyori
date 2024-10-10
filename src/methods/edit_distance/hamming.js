@@ -1,4 +1,4 @@
-const { allAreNotNil } = require('../libs/lang.js');
+const { allAreNotNil } = require('../../libs/lang.js');
 
 
 function fn_hamming(term, text) {
