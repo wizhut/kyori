@@ -1,7 +1,7 @@
 const t = require('tap');
 
 
-const { damerau_levensthein } = require('../src/methods/damerau_levensthein.js');
+const { damerau_levensthein } = require('../src/methods/edit_distance/damerau_levensthein.js');
 
 
 t.test('kyori/damerau_levensthein/tests', (t) => {
