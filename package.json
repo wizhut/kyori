@@ -9,7 +9,7 @@
     },
     "dependencies": {
         "talisman": "1.1.4",
-        "fuzzball": "2.1.3"
+        "transliteration": "2.3.5"
     },
     "devDependencies": {
         "tap": "21.0.1"

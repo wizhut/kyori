@@ -13,9 +13,7 @@ function tokenizeTerm(term) {
         return [];
     }
 
-    const individualTerms = strippedTerm.split(' ');
-
-    return individualTerms.filter((t) => t.length > 0).map((t) => t.trim());
+    return strippedTerm.split(' ').filter((t) => t.length > 0).map((t) => t.trim());
 }
 
 
