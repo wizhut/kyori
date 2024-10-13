@@ -1,6 +1,6 @@
 const { transliterate: tr } = require('transliteration');
 
-const { tokenize_term } = require("../../libs/tokenize.js");
+const { tokenizeTerm } = require("../../libs/tokenize.js");
 
 
 function fn_similarity(terms, text) {
@@ -14,15 +14,24 @@ function fn_similarity(terms, text) {
     const trTextLen = trText.length;
 
     // tokenize
-    const termTokens = tokenize_term(terms);
+    const termTokens = tokenizeTerm(trTerm);
 
-    // penalize with range
+    // penalize with range of whole keywords
     let score = Math.abs(trTextLen - trTermLen);
 
     for (let i = 0; i < termTokens.length; i++) {
         const token = termTokens[i];
+        const textIndex = trText.indexOf(token);
 
+        if (textIndex === -1) {
+            score += token.length;
+            continue;
+        }
 
+        const termIndex = trTerm.indexOf(token)
+        const indexDistance = Math.abs(textIndex - termIndex);
+
+        score += indexDistance;
     }
 
     return score;
