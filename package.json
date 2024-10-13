@@ -1,6 +1,6 @@
 {
     "name": "@wizhut_tech/kyori",
-    "version": "0.0.10",
+    "version": "0.0.11",
     "description": "A library that focuses on edit distance and similarity algorithms for string",
     "main": "src/index.js",
     "scripts": {
@@ -15,7 +15,8 @@
         "tap": "21.0.1"
     },
     "keywords": [
-        "string distance",
+        "string edit distance",
+        "string similarity",
         "levensthein",
         "hamming",
         "jaro_winkler",
