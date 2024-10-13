@@ -31,10 +31,9 @@ It provides support for the following methods:
 * **Damerau-Levenshtein**: An extension of the Levenshtein distance, this method also accounts for transpositions (swapping of two adjacent characters) in addition to insertions, deletions, and substitutions. It is particularly useful when transposition errors are common, such as in typographical mistakes.
 * **Hamming Distance**: This method calculates the number of positions at which the corresponding characters in two strings of equal length are different. It is only applicable when the strings are of the same length and is often used in error detection and correction algorithms.
 * **Jaro-Winkler**: This method is particularly effective for short strings such as names. It calculates a similarity score based on the number and order of common characters, giving higher scores to strings that match from the beginning.
-* **Kyori**: *Work in progress*
+* **Kyori**: A similarity method that is token sensitive and focus of the similarity of a term to a specific text. It is ideal to rank results for autocomplete interfaces.
 
-Except, *kyori* all the other methods are wrapper on the [talisman library](https://yomguithereal.github.io/talisman/) ↗. For these early versions, this 
-library will be used as a dependency, but since it has not been updated for 3-4 years, it will be replaced in the next versions.
+Except, *kyori*, *hamming* and *levensthein* all the other methods are wrapper on the [talisman library](https://yomguithereal.github.io/talisman/) ↗. For these early versions, this library will be used as a dependency, but since it has not been updated for 3-4 years, it will be replaced in future versions.
 
 ## Usage
 
@@ -127,8 +126,18 @@ jaro_winkler.distance('foo', 'bar') // should be 0
 
 ### Kyori
 
-**Not implemented yet**
+```javascript
+const { kyori } = require('kyori');
+```
 
-# aob
+*Usage*:
+
+```javascript
+kyori.similarity('foo', 'foo')  // should be 0
+kyori.similarity('foo', 'food') // should be 1
+kyori.similarity('foo', 'ifoo') // should be 2
+```
+
+# License and usage
 
 Released under MIT license and maintained by [wizhut.tech](https://www.wizhut.tech) ↗.
