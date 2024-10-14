@@ -30,10 +30,10 @@ It provides support for the following methods for edit string distance:
 * **Levenshtein**: It measures the minimum number of single-character edits—insertions, deletions, or substitutions—required to change one word into the other.
 * **Damerau-Levenshtein**: An extension of the Levenshtein distance, this method also accounts for transpositions (swapping of two adjacent characters) in addition to insertions, deletions, and substitutions. It is particularly useful when transposition errors are common, such as in typographical mistakes.
 * **Hamming Distance**: This method calculates the number of positions at which the corresponding characters in two strings of equal length are different. It is only applicable when the strings are of the same length and is often used in error detection and correction algorithms.
-* **Jaro-Winkler**: This method is particularly effective for short strings such as names. It calculates a similarity score based on the number and order of common characters, giving higher scores to strings that match from the beginning.
 
 ... and for string similarity:
 
+* **Jaro-Winkler**: This method is particularly effective for short strings such as names. It calculates a similarity score based on the number and order of common characters, giving higher scores to strings that match from the beginning.
 * **Kyori**: A similarity method that is token sensitive and focus of the similarity of a term to a specific text. It is ideal to rank results for autocomplete interfaces.
 
 Except, *kyori*, *hamming* and *levensthein* all the other methods are wrapper on the [talisman library](https://yomguithereal.github.io/talisman/) ↗. For these early versions, this library will be used as a dependency, but since it has not been updated for 3-4 years, it will be replaced in future versions.
@@ -123,8 +123,8 @@ const { jaro_winkler } = require('kyori');
 *Usage*:
 
 ```javascript
-jaro_winkler.distance('foo', 'foo') // should be 1
-jaro_winkler.distance('foo', 'bar') // should be 0
+jaro_winkler.similarity('foo', 'foo') // should be 1
+jaro_winkler.similarity('foo', 'bar') // should be 0
 ```
 
 ### Kyori

@@ -1,6 +1,6 @@
 {
     "name": "@wizhut_tech/kyori",
-    "version": "0.0.11",
+    "version": "0.0.12",
     "description": "A library that focuses on edit distance and similarity algorithms for string",
     "main": "src/index.js",
     "scripts": {
