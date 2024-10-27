@@ -1,6 +1,6 @@
 {
     "name": "@wizhut_tech/kyori",
-    "version": "0.0.12",
+    "version": "0.0.13",
     "description": "A library that focuses on edit distance and similarity algorithms for string",
     "main": "src/index.js",
     "scripts": {
@@ -16,11 +16,12 @@
     },
     "keywords": [
         "string edit distance",
-        "string similarity",
+        "similarity",
+        "string edit distance",
         "levensthein",
         "hamming",
-        "jaro_winkler",
-        "damerau-levensthein"
+        "jaro winkler",
+        "damerau levensthein"
     ],
     "author": "Vassilios Karakoidas <vassilios.karakoidas@weizhut.tech>",
     "license": "MIT",
