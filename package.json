@@ -1,11 +1,10 @@
 {
     "name": "@wizhut_tech/kyori",
-    "version": "0.0.14",
+    "version": "0.0.15",
     "description": "A library that focuses on edit distance and similarity algorithms for string",
     "main": "src/index.js",
     "scripts": {
-        "test": "tap run",
-        "rank-test": "node src/rank_test.js"
+        "test": "tap run"
     },
     "dependencies": {
         "talisman": "1.1.4",

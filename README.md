@@ -54,8 +54,8 @@ the object is structured as followed:
         levensthein: distance(),
         damerau_levensthein: distance(),
         hamming: distance(),
-        jaro_winkler: distance(),
-        ...
+        jaro_winkler: similarity(),
+        kyori: similarity()
     }
 }
 ```
