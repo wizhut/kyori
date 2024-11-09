@@ -1,9 +1,9 @@
 const t = require('tap');
 
-const { tokenizeTerm } = require('../src/libs/tokenize.js');
+const { tokenizeTerm } = require('../src/common/tokenize.js');
 
 
-t.test('libs/tokenizer', (t) => {
+t.test('common/tokenizer', (t) => {
     t.has(tokenizeTerm('foo'), ['foo']);
     t.has(tokenizeTerm('bar   '), ['bar']);
     t.has(tokenizeTerm('    bar'), ['bar']);

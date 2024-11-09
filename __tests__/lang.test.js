@@ -1,9 +1,9 @@
 const t = require('tap');
 
-const { isNil, allAreNotNil } = require('../src/libs/lang.js');
+const { isNil, allAreNotNil } = require('../src/common/lang.js');
 
 
-t.test('libs/lang/isNil', (t) => {
+t.test('common/lang/isNil', (t) => {
     t.equal(isNil('foo'), false);
     t.equal(isNil(undefined), true);
     t.equal(isNil(null), true);
@@ -13,7 +13,7 @@ t.test('libs/lang/isNil', (t) => {
     t.end();
 });
 
-t.test('libs/lang/allAreNotNil', (t) => {
+t.test('common/lang/allAreNotNil', (t) => {
     t.equal(allAreNotNil(['foo']), true);
     t.equal(allAreNotNil(['foo', null]), false);
     t.equal(allAreNotNil([undefined, 'foo']), false);

@@ -6,9 +6,14 @@ const { hamming } = require('./methods/edit_distance/hamming.js');
 
 
 module.exports = {
-    levensthein,
-    kyori,
-    jaro_winkler,
-    damerau_levensthein,
-    hamming
+    methods: {
+        levensthein,
+        kyori,
+        jaro_winkler,
+        damerau_levensthein,
+        hamming
+    },
+    indices: {
+
+    }
 };

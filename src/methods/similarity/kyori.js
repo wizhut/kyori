@@ -1,6 +1,6 @@
 const { transliterate: tr } = require('transliteration');
 
-const { tokenizeTerm } = require("../../libs/tokenize.js");
+const { tokenizeTerm } = require("../../common/tokenize.js");
 
 
 function fn_similarity(terms, text) {
