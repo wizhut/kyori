@@ -1,6 +1,6 @@
 const t = require('tap');
 
-const { levensthein } = require('../src/index.js');
+const { methods: {levensthein} } = require('../src/index.js');
 
 
 t.test('kyori/levensthein/distance', (t) => {

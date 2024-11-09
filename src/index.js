@@ -3,6 +3,7 @@ const { kyori } = require('./methods/similarity/kyori.js');
 const { jaro_winkler } = require('./methods/similarity/jaro_winkler.js');
 const { damerau_levensthein } = require('./methods/edit_distance/damerau_levensthein.js');
 const { hamming } = require('./methods/edit_distance/hamming.js');
+const { KyoriIndex } = require('./indices/kyori.js');
 
 
 module.exports = {
@@ -14,6 +15,6 @@ module.exports = {
         hamming
     },
     indices: {
-
+        KyoriIndex
     }
 };
