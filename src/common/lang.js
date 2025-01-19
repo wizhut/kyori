@@ -1,4 +1,4 @@
-
+const { lang } = require('@wizhut_tech/wizjs');
 
 function allAreNotNil(arrayOfValues) {
     if (arrayOfValues.length === 0) {
@@ -6,7 +6,7 @@ function allAreNotNil(arrayOfValues) {
     }
 
     for (let i = 0; i < arrayOfValues.length; i++) {
-        if (isNil(arrayOfValues[i])) {
+        if (lang.checks.isNil(arrayOfValues[i])) {
             return false;
         }
     }
@@ -14,13 +14,6 @@ function allAreNotNil(arrayOfValues) {
     return true;
 }
 
-
-function isNil(value) {
-    return value === null || value === undefined;
-}
-
-
 module.exports = {
-  isNil,
   allAreNotNil
 };

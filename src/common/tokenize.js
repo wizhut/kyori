@@ -1,9 +1,8 @@
-
-const { isNil } = require("./lang.js");
+const { lang } = require('@wizhut_tech/wizjs');
 
 
 function tokenizeTerm(term) {
-    if (isNil(term)) {
+    if (lang.checks.isNil(term)) {
         return [];
     }
 

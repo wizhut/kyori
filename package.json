@@ -8,7 +8,8 @@
     },
     "dependencies": {
         "talisman": "1.1.4",
-        "transliteration": "2.3.5"
+        "transliteration": "2.3.5",
+        "@wizhut_tech/wizjs": "0.0.6"
     },
     "devDependencies": {
         "tap": "21.0.1"
