@@ -12,7 +12,10 @@
         "@wizhut_tech/wizjs": "0.0.6"
     },
     "devDependencies": {
-        "tap": "21.0.1"
+        "tap": "21.7.4"
+    },
+    "overrides": {
+        "lodash": "4.18.1"
     },
     "keywords": [
         "string edit distance",

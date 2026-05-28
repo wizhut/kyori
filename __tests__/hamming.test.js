@@ -7,5 +7,8 @@ t.test('kyori/hamming/tests', (t) => {
     t.equal(hamming.distance('foo', 'foo'), 0);
     t.equal(hamming.distance('foo', 'fob'), 1);
     t.equal(hamming.distance('foo', 'food'), -1);
+    // nil input on either side returns -1
+    t.equal(hamming.distance(null, 'foo'), -1);
+    t.equal(hamming.distance('foo', null), -1);
     t.end();
 });
