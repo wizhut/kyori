@@ -1,39 +1,39 @@
 {
-    "name": "@wizhut_tech/kyori",
-    "version": "0.1.1",
-    "description": "A library that focuses on edit distance and similarity algorithms for string",
-    "main": "src/index.js",
-    "scripts": {
-        "test": "tap run"
-    },
-    "dependencies": {
-        "talisman": "1.1.4",
-        "transliteration": "2.3.5",
-        "@wizhut_tech/wizjs": "0.0.6"
-    },
-    "devDependencies": {
-        "tap": "21.7.4"
-    },
-    "overrides": {
-        "lodash": "4.18.1"
-    },
-    "keywords": [
-        "string edit distance",
-        "similarity",
-        "string edit distance",
-        "levensthein",
-        "hamming",
-        "jaro winkler",
-        "damerau levensthein"
-    ],
-    "author": "Vassilios Karakoidas <vassilios.karakoidas@weizhut.tech>",
-    "license": "MIT",
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/wizhut/kyori.git"
-    },
-    "bugs": {
-        "url": "https://github.com/wizhut/kyori/issues"
-    },
-    "homepage": "https://github.com/wizhut/kyori#readme"
+  "author": "Vassilios Karakoidas \u003cvassilios.karakoidas@weizhut.tech\u003e",
+  "bugs": {
+    "url": "https://github.com/wizhut/kyori/issues"
+  },
+  "dependencies": {
+    "@wizhut_tech/wizjs": "0.0.6",
+    "talisman": "1.1.4",
+    "transliteration": "2.3.5"
+  },
+  "description": "A library that focuses on edit distance and similarity algorithms for string",
+  "devDependencies": {
+    "tap": "21.7.4"
+  },
+  "homepage": "https://github.com/wizhut/kyori#readme",
+  "keywords": [
+    "string edit distance",
+    "similarity",
+    "string edit distance",
+    "levensthein",
+    "hamming",
+    "jaro winkler",
+    "damerau levensthein"
+  ],
+  "license": "MIT",
+  "main": "src/index.js",
+  "name": "@wizhut_tech/kyori",
+  "overrides": {
+    "lodash": "4.18.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wizhut/kyori.git"
+  },
+  "scripts": {
+    "test": "tap run"
+  },
+  "version": "0.1.2"
 }
