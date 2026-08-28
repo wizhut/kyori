@@ -1,16 +1,14 @@
 {
-  "author": "Vassilios Karakoidas \u003cvassilios.karakoidas@weizhut.tech\u003e",
+  "author": "Vassilios Karakoidas <vassilios.karakoidas@weizhut.tech>",
   "bugs": {
     "url": "https://github.com/wizhut/kyori/issues"
   },
   "dependencies": {
-    "@wizhut_tech/wizjs": "0.0.6",
-    "talisman": "1.1.4",
-    "transliteration": "2.3.5"
+    "@wizhut_tech/wizjs": "0.1.7"
   },
   "description": "A library that focuses on edit distance and similarity algorithms for string",
   "devDependencies": {
-    "tap": "21.7.4"
+    "tap": "21.7.5"
   },
   "homepage": "https://github.com/wizhut/kyori#readme",
   "keywords": [
@@ -25,9 +23,6 @@
   "license": "MIT",
   "main": "src/index.js",
   "name": "@wizhut_tech/kyori",
-  "overrides": {
-    "lodash": "4.18.1"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/wizhut/kyori.git"
@@ -35,5 +30,5 @@
   "scripts": {
     "test": "tap run"
   },
-  "version": "0.1.2"
+  "version": "0.2.0"
 }

@@ -13,5 +13,9 @@ t.test('common/tokenizer', (t) => {
     t.has(tokenizeTerm(null), []);
     t.has(tokenizeTerm(undefined), []);
     t.has(tokenizeTerm('foo   baz fii'), ['foo', 'baz', 'fii']);
+    t.has(tokenizeTerm('foo\tbar'), ['foo', 'bar']);
+    t.has(tokenizeTerm('   '), []);
+    t.has(tokenizeTerm('foo-bar'), ['foo', 'bar']);
+    t.has(tokenizeTerm('covid-19'), ['covid', '19']);
     t.end();
 });

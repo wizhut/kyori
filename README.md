@@ -2,17 +2,15 @@
 
 A library that offers many methods to calculate string edit distance.
 In addition, it offers the Kyori algorithm, a simple-yet-nice approach to rank
-several results against a set of terms (keywords). It is handy when you have search 
+several results against a set of terms (keywords). It is handy when you have search
 results, and you want to return the most relevant lexicographically.
 
 In Japanese, the word for “distance” is 距離 pronounced as **kyori** (きょり).
 
 ## Install
 
-Installing the library is simple, just run the following command.
-
 ```bash
-npm install kyori
+npm install @wizhut_tech/kyori
 ```
 
 ## Run unit tests
@@ -34,28 +32,31 @@ It provides support for the following methods for edit string distance:
 ... and for string similarity:
 
 * **Jaro-Winkler**: This method is particularly effective for short strings such as names. It calculates a similarity score based on the number and order of common characters, giving higher scores to strings that match from the beginning.
-* **Kyori**: A similarity method that is token sensitive and focus of the similarity of a term to a specific text. It is ideal to rank results for autocomplete interfaces.
+* **Kyori**: A similarity method that is token sensitive and focus of the similarity of a term to a specific text. It is ideal to rank results for autocomplete interfaces. Matching is case-insensitive, folds Latin diacritics, treats hyphens as spaces, prefers word-prefix hits over infix, and falls back to Damerau-Levenshtein for typos. **Lower is better** (0 = best match).
 
-Except, *kyori*, *hamming*. *Jaro-Winkler* and *levensthein* all the other methods are wrapper on the [talisman library](https://yomguithereal.github.io/talisman/) ↗. For these early versions, this library will be used as a dependency, but since it has not been updated for 3-4 years, it will be replaced in future versions.
+All methods are implemented natively in this library.
 
 ## Usage
 
 Using the library is also straightforward. First, you must include the top-level kyori module,
 
 ```javascript
-const kyori = require('kyori');
+const { methods, indices } = require('@wizhut_tech/kyori');
 ```
 
 the object is structured as followed:
 
 ```text
 {
-    kyori: {
-        levensthein: distance(),
-        damerau_levensthein: distance(),
-        hamming: distance(),
-        jaro_winkler: similarity(),
-        kyori: similarity()
+    methods: {
+        levensthein: { distance() },
+        damerau_levensthein: { distance() },
+        hamming: { distance() },
+        jaro_winkler: { similarity() },
+        kyori: { similarity() }
+    },
+    indices: {
+        KyoriIndex
     }
 }
 ```
@@ -67,7 +68,7 @@ and then call the appropriate method you want to use. You can also include the d
 Definition can be found [here](https://en.wikipedia.org/wiki/Levenshtein_distance) ↗. This metric is natively implemented.
 
 ```javascript
-const { levensthein } = require('kyori');
+const { methods: { levensthein } } = require('@wizhut_tech/kyori');
 ```
 
 *Example*:
@@ -80,10 +81,10 @@ levensthein.distance('foo', null)   // should be -1
 
 ### Damerau-Levensthein
 
-Definition can be found [here](https://en.wikipedia.org/wiki/Damerau–Levenshtein_distance) ↗.
+Definition can be found [here](https://en.wikipedia.org/wiki/Damerau–Levenshtein_distance) ↗. This metric is natively implemented.
 
 ```javascript
-const { damerau_levensthein } = require('kyori');
+const { methods: { damerau_levensthein } } = require('@wizhut_tech/kyori');
 ```
 
 *Example*:
@@ -91,7 +92,8 @@ const { damerau_levensthein } = require('kyori');
 ```javascript
 damerau_levensthein.distance('foo', 'foo');   // should be 0
 damerau_levensthein.distance('foo', 'food');  // should be 1
-damerau_levensthein.distance('foo', 'foodo'); // should be 2
+damerau_levensthein.distance('ab', 'ba');     // should be 1 (transposition)
+damerau_levensthein.distance('foo', null);    // should be -1
 ```
 
 ### Hamming distance
@@ -99,7 +101,7 @@ damerau_levensthein.distance('foo', 'foodo'); // should be 2
 Definition can be found [here](https://en.wikipedia.org/wiki/Hamming_distance) ↗. This metric is natively implemented.
 
 ```javascript
-const { hamming } = require('kyori');
+const { methods: { hamming } } = require('@wizhut_tech/kyori');
 ```
 
 *Usage*:
@@ -117,7 +119,7 @@ hamming.distance('foo', 'food') // should be -1
 Definition can be found [here](https://en.wikipedia.org/wiki/Jaro–Winkler_distance) ↗.
 
 ```javascript
-const { jaro_winkler } = require('kyori');
+const { methods: { jaro_winkler } } = require('@wizhut_tech/kyori');
 ```
 
 *Usage*:
@@ -130,15 +132,35 @@ jaro_winkler.similarity('foo', 'bar') // should be 0
 ### Kyori
 
 ```javascript
-const { kyori } = require('kyori');
+const { methods: { kyori } } = require('@wizhut_tech/kyori');
 ```
 
 *Usage*:
 
 ```javascript
-kyori.similarity('foo', 'foo')  // should be 0
-kyori.similarity('foo', 'food') // should be 1
-kyori.similarity('foo', 'ifoo') // should be 2
+kyori.similarity('foo', 'foo')         // should be 0
+kyori.similarity('foo', 'food')        // should be 1 (prefix)
+kyori.similarity('foo', 'ifoo')        // should be 5 (not a word prefix)
+kyori.similarity('Foo', 'foo')         // should be 0 (case-insensitive)
+kyori.similarity('foo-bar', 'foo bar') // should be 0
+kyori.similarity('fod', 'food')        // should be 2 (typo)
+```
+
+### KyoriIndex
+
+`KyoriIndex` ranks stored terms with `kyori.similarity`. `search` returns `{ term, score }[]`, lowest score first (ties broken lexicographically).
+
+```javascript
+const { indices: { KyoriIndex } } = require('@wizhut_tech/kyori');
+
+const index = new KyoriIndex();
+index.addMany(['cart', 'artist', 'art']);
+index.search('art');
+// [
+//   { term: 'art',    score: 0 },
+//   { term: 'artist', score: 3 },
+//   { term: 'cart',   score: 5 }
+// ]
 ```
 
 # License and usage

@@ -8,14 +8,14 @@ function tokenizeTerm(term) {
 
     const strippedTerm = term.trim();
 
-    if (term.length === 0) {
+    if (strippedTerm.length === 0) {
         return [];
     }
 
-    return strippedTerm.split(' ').filter((t) => t.length > 0).map((t) => t.trim());
+    return strippedTerm.split(/[\s\-\u2010-\u2014]+/).filter((t) => t.length > 0);
 }
 
 
 module.exports = {
     tokenizeTerm
-}
+};

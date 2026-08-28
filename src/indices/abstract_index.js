@@ -1,5 +1,3 @@
-
-
 class AbstractIndex {
     constructor() {
         this.terms = [];
@@ -10,7 +8,14 @@ class AbstractIndex {
     }
 
     addMany(terms) {
-        this.terms.push(terms);
+        if (!Array.isArray(terms)) {
+            this.addOne(terms);
+            return;
+        }
+
+        for (let i = 0; i < terms.length; i++) {
+            this.addOne(terms[i]);
+        }
     }
 
     count() {
@@ -25,4 +30,4 @@ class AbstractIndex {
 
 module.exports = {
     AbstractIndex
-}
+};
