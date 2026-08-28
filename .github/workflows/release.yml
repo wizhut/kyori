@@ -21,10 +21,12 @@ jobs:
         with:
           fetch-depth: 0 # --generate-notes diffs against the previous tag
 
+      # Do not set registry-url here: setup-node would write an .npmrc with an
+      # empty _authToken and that short-circuits npm OIDC trusted publishing
+      # (the CLI then 404s the PUT as if the package did not exist).
       - uses: actions/setup-node@v7
         with:
           node-version: "24"
-          registry-url: "https://registry.npmjs.org"
 
       # `npm version` keeps these in step; a hand-made tag might not.
       - name: Check the tag matches package.json
