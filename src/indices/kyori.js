@@ -15,21 +15,7 @@ class KyoriIndex extends AbstractIndex {
             });
         }
 
-        ranked.sort((a, b) => {
-            if (a.score !== b.score) {
-                return a.score - b.score;
-            }
-
-            if (a.term < b.term) {
-                return -1;
-            }
-
-            if (a.term > b.term) {
-                return 1;
-            }
-
-            return 0;
-        });
+        ranked.sort((a, b) => a.score - b.score || String(a.term).localeCompare(b.term));
 
         return ranked;
     }

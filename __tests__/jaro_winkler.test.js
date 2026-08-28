@@ -6,6 +6,9 @@ const { jaro_winkler } = require('../src/methods/similarity/jaro_winkler.js');
 t.test('kyori/jaro_winkler/tests', (t) => {
     t.equal(jaro_winkler.similarity('test', 'test'), 1);
     t.equal(jaro_winkler.similarity('test', 'food'), 0);
+    // matching characters out of order count as transpositions
+    t.equal(jaro_winkler.similarity('martha', 'marhta'), 0.9611111111111111);
+    t.equal(jaro_winkler.similarity('abcd', 'abXd'), 0.8666666666666667);
     // an empty string on either side scores 0
     t.equal(jaro_winkler.similarity('', 'test'), 0);
     t.equal(jaro_winkler.similarity('test', ''), 0);

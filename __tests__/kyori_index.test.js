@@ -1,6 +1,15 @@
 const t = require('tap');
 
+const { AbstractIndex } = require('../src/indices/abstract_index.js');
 const { KyoriIndex } = require('../src/indices/kyori.js');
+
+
+t.test('indices/AbstractIndex search is a stub', (t) => {
+    const index = new AbstractIndex();
+
+    t.has(index.search('foo'), []);
+    t.end();
+});
 
 
 t.test('indices/KyoriIndex add and count', (t) => {
