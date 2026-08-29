@@ -43,7 +43,7 @@ t.test('indices/KyoriIndex search ranks by kyori score', (t) => {
     t.equal(ranked[0].term, 'foo');
     t.equal(ranked[0].score, 0);
     t.equal(ranked[1].term, 'food');
-    t.equal(ranked[1].score, 1);
+    t.equal(ranked[1].score, 0);
     t.equal(ranked[2].term, 'bar');
     t.equal(ranked[3].term, 'afoo');
     t.equal(ranked[3].score, 5);

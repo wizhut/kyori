@@ -1,11 +1,30 @@
 # Kyori
 
-A library that offers many methods to calculate string edit distance.
-In addition, it offers the Kyori algorithm, a simple-yet-nice approach to rank
-several results against a set of terms (keywords). It is handy when you have search
-results, and you want to return the most relevant lexicographically.
+A library of string **distance**, **similarity**, and **rank** methods.
+In addition, it offers the Kyori algorithm — a simple-yet-nice approach to
+order candidates against a query (handy for autocomplete and “best match”
+ordering after a filter).
 
 In Japanese, the word for “distance” is 距離 pronounced as **kyori** (きょり).
+
+## Uniform API
+
+Every method exposes the same three functions:
+
+| Method | Meaning | Sort for ranking |
+|---|---|---|
+| `similarity(a, b)` | pairwise resemblance | **higher** is better |
+| `distance(a, b)` | edit / cognitive cost | **lower** is better |
+| `rank(query, candidates)` | order a pool for a query | returns `{ term, score }[]` |
+
+Competitors derive the dual where needed (`distance ≈ 1 − similarity` for
+Jaro-Winkler; `similarity ≈ 1 − distance / maxLen` for edit metrics).
+Kyori keeps them **conceptually separate**: `distance` is the autocomplete /
+ranking cost; `similarity` is token-set Jaccard resemblance after fold.
+
+Invalid or ineligible inputs return `-1` from `distance` / `similarity`
+where that metric defines it (e.g. Hamming on unequal lengths). `rank`
+sorts ineligible scores last.
 
 ## Install
 
@@ -23,37 +42,33 @@ npm test
 
 ## Implemented methods
 
-It provides support for the following methods for edit string distance:
+Edit-distance family (native):
 
-* **Levenshtein**: It measures the minimum number of single-character edits—insertions, deletions, or substitutions—required to change one word into the other.
-* **Damerau-Levenshtein**: An extension of the Levenshtein distance, this method also accounts for transpositions (swapping of two adjacent characters) in addition to insertions, deletions, and substitutions. It is particularly useful when transposition errors are common, such as in typographical mistakes.
-* **Hamming Distance**: This method calculates the number of positions at which the corresponding characters in two strings of equal length are different. It is only applicable when the strings are of the same length and is often used in error detection and correction algorithms.
+* **Levenshtein**: minimum insertions, deletions, or substitutions to change one string into the other.
+* **Damerau-Levenshtein**: Levenshtein plus adjacent transpositions (common typo).
+* **Hamming**: positions that differ; equal length only (`-1` otherwise).
 
-... and for string similarity:
+Similarity / ranking family (native):
 
-* **Jaro-Winkler**: This method is particularly effective for short strings such as names. It calculates a similarity score based on the number and order of common characters, giving higher scores to strings that match from the beginning.
-* **Kyori**: A similarity method that is token sensitive and focus of the similarity of a term to a specific text. It is ideal to rank results for autocomplete interfaces. Matching is case-insensitive, folds Latin diacritics, treats hyphens as spaces, prefers word-prefix hits over infix, and falls back to Damerau-Levenshtein for typos. **Lower is better** (0 = best match).
-
-All methods are implemented natively in this library.
+* **Jaro-Winkler**: short-string resemblance (names); higher similarity is better.
+* **Kyori**: token-sensitive **ranking** cost for autocomplete. Matching is case-insensitive, folds Latin diacritics, treats hyphens as spaces, prefers word-prefix hits over infix, falls back to Damerau-Levenshtein for typos, charges a flat 1 for the same keywords in a different order, and for typed-prefix completions only charges edits inside the typed span. Use **`kyori.distance`** / **`kyori.rank`** for ordering (**lower** distance is better). Use **`kyori.similarity`** for pairwise token Jaccard (**higher** is better).
 
 ## Usage
-
-Using the library is also straightforward. First, you must include the top-level kyori module,
 
 ```javascript
 const { methods, indices } = require('@wizhut_tech/kyori');
 ```
 
-the object is structured as followed:
+Shape:
 
 ```text
 {
     methods: {
-        levensthein: { distance() },
-        damerau_levensthein: { distance() },
-        hamming: { distance() },
-        jaro_winkler: { similarity() },
-        kyori: { similarity() }
+        levensthein:        { distance(), similarity(), rank() },
+        damerau_levensthein:{ distance(), similarity(), rank() },
+        hamming:            { distance(), similarity(), rank() },
+        jaro_winkler:       { similarity(), distance(), rank() },
+        kyori:              { distance(), similarity(), rank() }
     },
     indices: {
         KyoriIndex
@@ -61,94 +76,89 @@ the object is structured as followed:
 }
 ```
 
-and then call the appropriate method you want to use. You can also include the desired method directly.
-
 ### Levensthein
 
-Definition can be found [here](https://en.wikipedia.org/wiki/Levenshtein_distance) ↗. This metric is natively implemented.
+Definition: [Wikipedia](https://en.wikipedia.org/wiki/Levenshtein_distance) ↗.
 
 ```javascript
 const { methods: { levensthein } } = require('@wizhut_tech/kyori');
-```
 
-*Example*:
-
-```javascript
-levensthein.distance('foo', 'foo')  // should be 0
-levensthein.distance('foo', 'food') // should be 1
-levensthein.distance('foo', null)   // should be -1
+levensthein.distance('foo', 'foo')   // 0
+levensthein.distance('foo', 'food')  // 1
+levensthein.similarity('foo', 'food') // 0.75
+levensthein.rank('foo', ['food', 'foo'])
+// [ { term: 'foo', score: 0 }, { term: 'food', score: 1 } ]
+levensthein.distance('foo', null)    // -1
 ```
 
 ### Damerau-Levensthein
 
-Definition can be found [here](https://en.wikipedia.org/wiki/Damerau–Levenshtein_distance) ↗. This metric is natively implemented.
+Definition: [Wikipedia](https://en.wikipedia.org/wiki/Damerau–Levenshtein_distance) ↗.
 
 ```javascript
 const { methods: { damerau_levensthein } } = require('@wizhut_tech/kyori');
-```
 
-*Example*:
-
-```javascript
-damerau_levensthein.distance('foo', 'foo');   // should be 0
-damerau_levensthein.distance('foo', 'food');  // should be 1
-damerau_levensthein.distance('ab', 'ba');     // should be 1 (transposition)
-damerau_levensthein.distance('foo', null);    // should be -1
+damerau_levensthein.distance('foo', 'foo')  // 0
+damerau_levensthein.distance('ab', 'ba')    // 1 (transposition)
+damerau_levensthein.distance('foo', null)   // -1
 ```
 
 ### Hamming distance
 
-Definition can be found [here](https://en.wikipedia.org/wiki/Hamming_distance) ↗. This metric is natively implemented.
+Definition: [Wikipedia](https://en.wikipedia.org/wiki/Hamming_distance) ↗.
+Equal-length strings only.
 
 ```javascript
 const { methods: { hamming } } = require('@wizhut_tech/kyori');
-```
 
-*Usage*:
-
-Keep in mind that hamming distance works only for string with same length.
-
-```javascript
-hamming.distance('foo', 'foo')  // should be 0
-hamming.distance('foo', 'fob')  // should be 1
-hamming.distance('foo', 'food') // should be -1
+hamming.distance('foo', 'foo')  // 0
+hamming.distance('foo', 'fob')  // 1
+hamming.distance('foo', 'food') // -1
 ```
 
 ### Jaro-Winkler
 
-Definition can be found [here](https://en.wikipedia.org/wiki/Jaro–Winkler_distance) ↗.
+Definition: [Wikipedia](https://en.wikipedia.org/wiki/Jaro–Winkler_distance) ↗.
 
 ```javascript
 const { methods: { jaro_winkler } } = require('@wizhut_tech/kyori');
-```
 
-*Usage*:
-
-```javascript
-jaro_winkler.similarity('foo', 'foo') // should be 1
-jaro_winkler.similarity('foo', 'bar') // should be 0
+jaro_winkler.similarity('foo', 'foo') // 1
+jaro_winkler.similarity('foo', 'bar') // 0
+jaro_winkler.distance('foo', 'foo')   // 0  (1 − similarity)
 ```
 
 ### Kyori
 
 ```javascript
 const { methods: { kyori } } = require('@wizhut_tech/kyori');
-```
 
-*Usage*:
+// Ranking / autocomplete cost — lower is better
+kyori.distance('foo', 'foo')                          // 0
+kyori.distance('foo', 'food')                         // 0 (typed prefix; unread suffix free)
+kyori.distance('chore lo', 'chore list for wall')     // 1
+kyori.distance('hotel bel-air', 'bel-air hotel')      // 1 (same keywords, order)
+kyori.distance('foo', 'ifoo')                         // 5 (not a word prefix)
+kyori.distance('fod', 'food')                         // 1 (typed-prefix window typo)
 
-```javascript
-kyori.similarity('foo', 'foo')         // should be 0
-kyori.similarity('foo', 'food')        // should be 1 (prefix)
-kyori.similarity('foo', 'ifoo')        // should be 5 (not a word prefix)
-kyori.similarity('Foo', 'foo')         // should be 0 (case-insensitive)
-kyori.similarity('foo-bar', 'foo bar') // should be 0
-kyori.similarity('fod', 'food')        // should be 2 (typo)
+// Pairwise resemblance — higher is better (token Jaccard after fold)
+kyori.similarity('hotel bel-air', 'bel-air hotel')    // 1
+kyori.similarity('foo', 'Foo Bar')                    // 0.5
+kyori.similarity('foo', 'food')                       // 0
+
+// Order a candidate pool (same scores as distance)
+kyori.rank('art', ['cart', 'artist', 'art'])
+// [
+//   { term: 'art',    score: 0 },
+//   { term: 'artist', score: 0 },
+//   { term: 'cart',   score: 5 }
+// ]
 ```
 
 ### KyoriIndex
 
-`KyoriIndex` ranks stored terms with `kyori.similarity`. `search` returns `{ term, score }[]`, lowest score first (ties broken lexicographically).
+`KyoriIndex.search` ranks stored terms with `kyori.rank` (by **distance**,
+lowest first; ties broken lexicographically).
 
 ```javascript
 const { indices: { KyoriIndex } } = require('@wizhut_tech/kyori');
@@ -158,10 +168,27 @@ index.addMany(['cart', 'artist', 'art']);
 index.search('art');
 // [
 //   { term: 'art',    score: 0 },
-//   { term: 'artist', score: 3 },
+//   { term: 'artist', score: 0 },
 //   { term: 'cart',   score: 5 }
 // ]
 ```
+
+## Upgrading from 0.2.x
+
+`kyori.similarity` changed meaning. In 0.2.x it returned the autocomplete
+ranking **cost** (lower is better); it now returns token-set Jaccard
+**resemblance** (higher is better). The old behaviour moved to
+`kyori.distance`:
+
+```javascript
+kyori.similarity(q, c)   // 0.2.x ranking cost
+kyori.distance(q, c)     // 0.3.0 — same behaviour, plus keyword-order
+                         //         and typed-prefix handling
+```
+
+`KyoriIndex.search` is unaffected: it still returns `{ term, score }[]`
+ordered best-first. Every other method gained `similarity`, `distance`, and
+`rank` without changing what it already returned.
 
 # License and usage
 

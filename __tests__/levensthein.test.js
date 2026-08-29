@@ -40,3 +40,22 @@ t.test('kyori/levensthein/distance/null-test', (t) => {
     t.equal(levensthein.distance(undefined, undefined), -1);
     t.end();
 });
+
+
+t.test('kyori/levensthein/similarity', (t) => {
+    t.equal(levensthein.similarity('foo', 'foo'), 1);
+    t.equal(levensthein.similarity('foo', 'food'), 0.75);
+    t.equal(levensthein.similarity(null, 'foo'), -1);
+    t.end();
+});
+
+
+t.test('kyori/levensthein/rank', (t) => {
+    const ranked = levensthein.rank('foo', ['food', 'foo', 'bar']);
+
+    t.equal(ranked[0].term, 'foo');
+    t.equal(ranked[0].score, 0);
+    t.equal(ranked[1].term, 'food');
+    t.equal(ranked[1].score, 1);
+    t.end();
+});

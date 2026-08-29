@@ -1,3 +1,8 @@
+const {
+    distanceFromSimilarity,
+    rankBySimilarity
+} = require('../../common/method_api.js');
+
 
 function jaroWinkler(s1, s2) {
     if (s1.length === 0 || s2.length === 0) {
@@ -62,8 +67,21 @@ function calculateJaro(s1, s2) {
     return (matches / len1 + matches / len2 + (matches - transpositions) / matches) / 3;
 }
 
+
+function jaroWinklerDistance(s1, s2) {
+    return distanceFromSimilarity(jaroWinkler(s1, s2));
+}
+
+
+function jaroWinklerRank(query, candidates) {
+    return rankBySimilarity(jaroWinkler, query, candidates);
+}
+
+
 module.exports = {
     jaro_winkler: {
-        similarity: jaroWinkler
+        similarity: jaroWinkler,
+        distance: jaroWinklerDistance,
+        rank: jaroWinklerRank
     }
-}
+};

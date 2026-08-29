@@ -1,4 +1,8 @@
 const { allAreNotNil } = require('../../common/lang.js');
+const {
+    similarityFromDistance,
+    rankByDistance
+} = require('../../common/method_api.js');
 
 
 function fl_distance(terms, text) {
@@ -53,8 +57,20 @@ function fl_distance(terms, text) {
 }
 
 
+function fl_similarity(terms, text) {
+    return similarityFromDistance(fl_distance(terms, text), terms, text);
+}
+
+
+function fl_rank(query, candidates) {
+    return rankByDistance(fl_distance, query, candidates);
+}
+
+
 module.exports = {
     damerau_levensthein: {
-        distance: fl_distance
+        distance: fl_distance,
+        similarity: fl_similarity,
+        rank: fl_rank
     }
 };

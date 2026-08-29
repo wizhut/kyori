@@ -10,3 +10,4 @@ node_modules
 *.pem
 *.key
 CLAUDE.md
+.DS_Store

@@ -1,4 +1,8 @@
 const { allAreNotNil } = require('../../common/lang.js');
+const {
+    similarityFromDistance,
+    rankByDistance
+} = require('../../common/method_api.js');
 
 
 function fn_hamming(term, text) {
@@ -22,8 +26,20 @@ function fn_hamming(term, text) {
 }
 
 
+function fn_similarity(term, text) {
+    return similarityFromDistance(fn_hamming(term, text), term, text);
+}
+
+
+function fn_rank(query, candidates) {
+    return rankByDistance(fn_hamming, query, candidates);
+}
+
+
 module.exports = {
     hamming: {
-        distance: fn_hamming
+        distance: fn_hamming,
+        similarity: fn_similarity,
+        rank: fn_rank
     }
 };

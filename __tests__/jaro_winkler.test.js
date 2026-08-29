@@ -14,3 +14,16 @@ t.test('kyori/jaro_winkler/tests', (t) => {
     t.equal(jaro_winkler.similarity('test', ''), 0);
     t.end();
 });
+
+
+t.test('kyori/jaro_winkler/distance and rank', (t) => {
+    t.equal(jaro_winkler.distance('test', 'test'), 0);
+    t.equal(jaro_winkler.distance('test', 'food'), 1);
+
+    const ranked = jaro_winkler.rank('martha', ['marhta', 'food', 'martha']);
+
+    t.equal(ranked[0].term, 'martha');
+    t.equal(ranked[1].term, 'marhta');
+    t.equal(ranked[2].term, 'food');
+    t.end();
+});
