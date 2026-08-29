@@ -97,17 +97,6 @@ function sameKeywordBag(a, b) {
 }
 
 
-function sameTokenOrder(a, b) {
-    for (let i = 0; i < a.length; i++) {
-        if (a[i] !== b[i]) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-
 /**
  * Cognitive / autocomplete cost. Lower is better (0 = best match).
  * Prefer this (or rank) when ordering candidates for a query.
@@ -127,9 +116,11 @@ function fn_distance(terms, text) {
     const termTokens = tokenizeTerm(trTerm);
     const textTokens = tokenizeTerm(trText);
 
-    // Whole keyword match (same tokens as a bag): order-only difference → 1.
+    // Whole keyword match (same tokens as a bag). Equal bags in equal order
+    // would have folded to the same string and returned 0 above, so reaching
+    // here means the order differs → flat 1.
     if (termTokens.length > 0 && sameKeywordBag(termTokens, textTokens)) {
-        return sameTokenOrder(termTokens, textTokens) ? 0 : 1;
+        return 1;
     }
 
     // Autocomplete typed-prefix path: candidate is at least as long, shares the
@@ -184,10 +175,6 @@ function fn_similarity(terms, text) {
 
     const termTokens = tokenizeTerm(trTerm);
     const textTokens = tokenizeTerm(trText);
-
-    if (termTokens.length === 0 && textTokens.length === 0) {
-        return 1;
-    }
 
     if (termTokens.length === 0 || textTokens.length === 0) {
         return 0;
