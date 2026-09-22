@@ -1,4 +1,4 @@
-const { lang } = require('@wizhut_tech/wizjs');
+const { isNil } = require('@wizhut_tech/wizjs/lang/checks');
 
 const { transliterate: tr } = require('../../common/transliterate.js');
 const { tokenizeTerm } = require('../../common/tokenize.js');
@@ -9,7 +9,7 @@ const DASH = /[\-\u2010-\u2014]/g;
 
 
 function fold(value) {
-    if (lang.checks.isNil(value)) {
+    if (isNil(value)) {
         return '';
     }
 

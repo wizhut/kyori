@@ -4,7 +4,7 @@
     "url": "https://github.com/wizhut/kyori/issues"
   },
   "dependencies": {
-    "@wizhut_tech/wizjs": "0.1.7"
+    "@wizhut_tech/wizjs": "0.2.1"
   },
   "description": "A library that focuses on edit distance and similarity algorithms for string",
   "devDependencies": {
