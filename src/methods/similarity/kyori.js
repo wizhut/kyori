@@ -72,6 +72,53 @@ function typoPenalty(token, text) {
 }
 
 
+/**
+ * Prefix edit distance, as in error-tolerant autocompletion: the smallest OSA
+ * Damerau-Levenshtein distance between the typed text and any prefix of the
+ * candidate. Same recurrence as damerau_levensthein.distance; only prefixes of
+ * up to |typed| + maxEdits characters can come within maxEdits, so the table
+ * stops there.
+ */
+function prefixEditDistance(typed, text, maxEdits) {
+    const m = typed.length;
+    const n = Math.min(text.length, m + maxEdits);
+
+    let prev2 = [];
+    let prev = [];
+
+    for (let j = 0; j <= n; j++) {
+        prev[j] = j;
+    }
+
+    let curr = prev;
+
+    for (let i = 1; i <= m; i++) {
+        curr = [i];
+
+        for (let j = 1; j <= n; j++) {
+            const cost = typed[i - 1] === text[j - 1] ? 0 : 1;
+
+            curr[j] = Math.min(
+                prev[j] + 1,
+                curr[j - 1] + 1,
+                prev[j - 1] + cost
+            );
+
+            if (i > 1 && j > 1 &&
+                typed[i - 1] === text[j - 2] &&
+                typed[i - 2] === text[j - 1]) {
+                curr[j] = Math.min(curr[j], prev2[j - 2] + 1);
+            }
+        }
+
+        prev2 = prev;
+        prev = curr;
+    }
+
+    return Math.min(...curr);
+}
+
+
 function sameKeywordBag(a, b) {
     if (a.length !== b.length) {
         return false;
@@ -124,17 +171,17 @@ function fn_distance(terms, text) {
         return 1;
     }
 
-    // Autocomplete typed-prefix path: candidate is at least as long, shares the
-    // first character, and the leading |Q| window is a near match → score only
-    // edits inside that window (unread suffix free). Far windows fall through
-    // to the token path so mid-string hits (e.g. "tikka" in a longer title)
-    // are not beaten by unrelated same-initial distractors.
-    if (trTerm.length > 0 && trText.length >= trTerm.length && trTerm[0] === trText[0]) {
-        const windowDist = damerau_levensthein.distance(trTerm, trText.slice(0, trTerm.length));
-        const maxWindowEdits = Math.max(1, Math.floor(trTerm.length / 3));
+    // Autocomplete typed-prefix path: the candidate shares the first character
+    // and some prefix of it is within a few edits of the typed text (prefix
+    // edit distance) → score only those edits; the unread rest is free. Far
+    // prefixes fall through to the token path so mid-string hits (e.g. "tikka"
+    // in a longer title) are not beaten by unrelated same-initial distractors.
+    if (trTerm.length > 0 && trTerm[0] === trText[0]) {
+        const maxEdits = Math.max(1, Math.floor(trTerm.length / 3));
+        const prefixDist = prefixEditDistance(trTerm, trText, maxEdits);
 
-        if (windowDist <= maxWindowEdits) {
-            return windowDist;
+        if (prefixDist <= maxEdits) {
+            return prefixDist;
         }
     }
 

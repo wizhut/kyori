@@ -144,3 +144,18 @@ t.test('kyori/rankKey() is distance plus a length term below 1', (t) => {
     t.strictSame(kyori.rank('art', pool).map((r) => r.term), byKey);
     t.end();
 });
+
+
+t.test('kyori/distance() typed prefix uses prefix edit distance', (t) => {
+    // a missed or doubled letter costs one edit against the closest prefix,
+    // not two against a window of the typed length
+    t.equal(kyori.distance('dishwaher', 'dishwasher pods'), 1);
+    t.equal(kyori.distance('dishwassher', 'dishwasher pods'), 1);
+    t.equal(kyori.distance('dishwashr', 'dishwasher pods'), 1);
+    // the candidate may be shorter than what was typed
+    t.equal(kyori.distance('food', 'foo'), 1);
+    t.equal(kyori.distance('dishwasherr', 'dishwasher'), 1);
+    // the first character stays fixed
+    t.ok(kyori.distance('xishwasher', 'dishwasher pods') > 1);
+    t.end();
+});

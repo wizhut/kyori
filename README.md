@@ -51,7 +51,7 @@ Edit-distance family (native):
 Similarity / ranking family (native):
 
 * **Jaro-Winkler**: short-string resemblance (names); higher similarity is better.
-* **Kyori**: token-sensitive **ranking** cost for autocomplete. Matching is case-insensitive, folds Latin diacritics, treats hyphens as spaces, prefers word-prefix hits over infix, falls back to Damerau-Levenshtein for typos, charges a flat 1 for the same keywords in a different order, and for typed-prefix completions only charges edits inside the typed span. Use **`kyori.distance`** / **`kyori.rank`** for ordering (**lower** distance is better); `rank` sorts by distance, then by length (shorter completion first), then alphabetically, and **`kyori.rankKey`** is that order as one number. Use **`kyori.similarity`** for pairwise token Jaccard (**higher** is better).
+* **Kyori**: token-sensitive **ranking** cost for autocomplete. Matching is case-insensitive, folds Latin diacritics, treats hyphens as spaces, prefers word-prefix hits over infix, falls back to Damerau-Levenshtein for typos, charges a flat 1 for the same keywords in a different order, and for typed-prefix completions charges only the edits between what was typed and the closest prefix of the candidate (prefix edit distance, first character fixed). Use **`kyori.distance`** / **`kyori.rank`** for ordering (**lower** distance is better); `rank` sorts by distance, then by length (shorter completion first), then alphabetically, and **`kyori.rankKey`** is that order as one number. Use **`kyori.similarity`** for pairwise token Jaccard (**higher** is better).
 
 ## Usage
 
@@ -157,7 +157,8 @@ kyori.distance('foo', 'food')                         // 0 (typed prefix; unread
 kyori.distance('chore lo', 'chore list for wall')     // 1
 kyori.distance('hotel bel-air', 'bel-air hotel')      // 1 (same keywords, order)
 kyori.distance('foo', 'ifoo')                         // 5 (not a word prefix)
-kyori.distance('fod', 'food')                         // 1 (typed-prefix window typo)
+kyori.distance('fod', 'food')                         // 1 (typed-prefix typo)
+kyori.distance('dishwaher', 'dishwasher pods')       // 1 (missed letter; the rest is unread)
 
 // Pairwise resemblance — higher is better (token Jaccard after fold)
 kyori.similarity('hotel bel-air', 'bel-air hotel')    // 1
