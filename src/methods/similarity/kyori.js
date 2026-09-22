@@ -99,7 +99,8 @@ function sameKeywordBag(a, b) {
 
 /**
  * Cognitive / autocomplete cost. Lower is better (0 = best match).
- * Prefer this (or rank) when ordering candidates for a query.
+ * rank() orders by this cost, then by length (shorter first); rankKey() is
+ * that order as one number.
  */
 function fn_distance(terms, text) {
     if (terms === text) {
@@ -194,8 +195,31 @@ function fn_similarity(terms, text) {
 }
 
 
+/**
+ * Length tie-breaker for rank(): a value in [0, 1) that grows with the folded
+ * candidate's length, so among candidates at the same distance the shorter
+ * completion comes first, and candidates at different distances never swap.
+ * On a list that already passed a prefix filter the distance is 0 for every
+ * exact completion; without this, their order fell to the alphabet.
+ */
+function lengthTieBreak(text) {
+    const len = fold(text).length;
+
+    return len / (len + 1);
+}
+
+
+/**
+ * The key rank() sorts by, as one number: distance, then length (shorter
+ * first). Use it to order candidates yourself with a single score per pair.
+ */
+function fn_rank_key(terms, text) {
+    return fn_distance(terms, text) + lengthTieBreak(text);
+}
+
+
 function fn_rank(query, candidates) {
-    return rankByDistance(fn_distance, query, candidates);
+    return rankByDistance(fn_distance, query, candidates, (q, term, distance) => distance + lengthTieBreak(term));
 }
 
 
@@ -203,6 +227,7 @@ module.exports = {
     kyori: {
         distance: fn_distance,
         similarity: fn_similarity,
-        rank: fn_rank
+        rank: fn_rank,
+        rankKey: fn_rank_key
     }
 };

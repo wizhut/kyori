@@ -25,7 +25,14 @@ function distanceFromSimilarity(similarity) {
 }
 
 
-function rankByDistance(distanceFn, query, candidates) {
+/**
+ * Order candidates by a distance function, lowest first. `keyFn(query, term,
+ * distance)` may refine the sort key -- a method's own tie-breaker -- provided it
+ * keeps the distance order; `score` in the result is always the distance.
+ * Ineligible scores (non-numbers, negatives) sort last; remaining ties are
+ * broken lexicographically.
+ */
+function rankByDistance(distanceFn, query, candidates, keyFn) {
     const list = Array.isArray(candidates) ? candidates : [];
     const scored = [];
 
@@ -37,7 +44,7 @@ function rankByDistance(distanceFn, query, candidates) {
         scored.push({
             term,
             score,
-            sortKey: ineligible ? Number.POSITIVE_INFINITY : score
+            sortKey: ineligible ? Number.POSITIVE_INFINITY : (keyFn ? keyFn(query, term, score) : score)
         });
     }
 

@@ -51,7 +51,7 @@ Edit-distance family (native):
 Similarity / ranking family (native):
 
 * **Jaro-Winkler**: short-string resemblance (names); higher similarity is better.
-* **Kyori**: token-sensitive **ranking** cost for autocomplete. Matching is case-insensitive, folds Latin diacritics, treats hyphens as spaces, prefers word-prefix hits over infix, falls back to Damerau-Levenshtein for typos, charges a flat 1 for the same keywords in a different order, and for typed-prefix completions only charges edits inside the typed span. Use **`kyori.distance`** / **`kyori.rank`** for ordering (**lower** distance is better). Use **`kyori.similarity`** for pairwise token Jaccard (**higher** is better).
+* **Kyori**: token-sensitive **ranking** cost for autocomplete. Matching is case-insensitive, folds Latin diacritics, treats hyphens as spaces, prefers word-prefix hits over infix, falls back to Damerau-Levenshtein for typos, charges a flat 1 for the same keywords in a different order, and for typed-prefix completions only charges edits inside the typed span. Use **`kyori.distance`** / **`kyori.rank`** for ordering (**lower** distance is better); `rank` sorts by distance, then by length (shorter completion first), then alphabetically, and **`kyori.rankKey`** is that order as one number. Use **`kyori.similarity`** for pairwise token Jaccard (**higher** is better).
 
 ## Usage
 
@@ -83,7 +83,7 @@ Shape:
         damerau_levensthein:{ distance(), similarity(), rank() },
         hamming:            { distance(), similarity(), rank() },
         jaro_winkler:       { similarity(), distance(), rank() },
-        kyori:              { distance(), similarity(), rank() }
+        kyori:              { distance(), similarity(), rank(), rankKey() }
     },
     indices: {
         KyoriIndex
@@ -164,19 +164,24 @@ kyori.similarity('hotel bel-air', 'bel-air hotel')    // 1
 kyori.similarity('foo', 'Foo Bar')                    // 0.5
 kyori.similarity('foo', 'food')                       // 0
 
-// Order a candidate pool (same scores as distance)
+// Order a candidate pool: by distance, then shorter first (scores are the distances)
 kyori.rank('art', ['cart', 'artist', 'art'])
 // [
 //   { term: 'art',    score: 0 },
 //   { term: 'artist', score: 0 },
 //   { term: 'cart',   score: 5 }
 // ]
+
+// The same order as one number per pair: distance + len/(len+1)
+kyori.rankKey('art', 'art')      // 0.75
+kyori.rankKey('art', 'artist')   // 0.857…
+kyori.rankKey('art', 'cart')     // 5.8
 ```
 
 ### KyoriIndex
 
 `KyoriIndex.search` ranks stored terms with `kyori.rank` (by **distance**,
-lowest first; ties broken lexicographically).
+lowest first; ties broken by length, shorter first, then lexicographically).
 
 ```javascript
 const { KyoriIndex } = require('@wizhut_tech/kyori/indices/kyori');

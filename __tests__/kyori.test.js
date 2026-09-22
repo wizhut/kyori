@@ -111,3 +111,36 @@ t.test('kyori/rank() orders by distance', (t) => {
     t.equal(ranked[2].score, 5);
     t.end();
 });
+
+
+t.test('kyori/rank() breaks distance ties by length, shorter first', (t) => {
+    // every candidate is an exact typed-prefix completion → distance 0 for all
+    const ranked = kyori.rank('circle', ['circle time pointer', 'circle placemats', 'circle stickets']);
+
+    t.equal(ranked[0].term, 'circle stickets');
+    t.equal(ranked[1].term, 'circle placemats');
+    t.equal(ranked[2].term, 'circle time pointer');
+    t.equal(ranked[0].score, 0);
+    t.equal(ranked[2].score, 0);
+    // equal length still ties → lexicographic
+    t.equal(kyori.rank('foo', ['foob', 'fooa'])[0].term, 'fooa');
+    // length is folded length: 'café' and 'cafe' tie
+    t.equal(kyori.rank('caf', ['café', 'cafe'])[0].term, 'cafe');
+    t.end();
+});
+
+
+t.test('kyori/rankKey() is distance plus a length term below 1', (t) => {
+    t.equal(kyori.rankKey('foo', 'foo'), 0.75);
+    t.equal(kyori.rankKey('foo', 'food'), 0.8);
+    t.equal(kyori.rankKey('foo', 'ofoo'), 5.8);
+    t.ok(kyori.rankKey('foo', 'foo') < kyori.rankKey('foo', 'food'));
+    // a long exact completion (distance 0) still beats a short typo (distance 1)
+    t.ok(kyori.rankKey('foo', 'food' + ' x'.repeat(100)) < kyori.rankKey('foo', 'fod'));
+    // rankKey order agrees with rank() order
+    const pool = ['cart', 'artist', 'art', 'art deco lamp'];
+    const byKey = pool.slice().sort((a, b) => kyori.rankKey('art', a) - kyori.rankKey('art', b) || a.localeCompare(b));
+
+    t.strictSame(kyori.rank('art', pool).map((r) => r.term), byKey);
+    t.end();
+});

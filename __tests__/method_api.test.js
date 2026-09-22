@@ -80,3 +80,22 @@ t.test('common/method_api/rankBySimilarity', (t) => {
     t.strictSame(rankBySimilarity(similarity, 'ab', undefined), []);
     t.end();
 });
+
+
+t.test('common/method_api/rankByDistance with a key function', (t) => {
+    const distance = () => 0;
+    const byLength = (query, term, d) => d + term.length;
+
+    t.strictSame(rankByDistance(distance, 'q', ['bb', 'a', 'ccc'], byLength), [
+        { term: 'a', score: 0 },
+        { term: 'bb', score: 0 },
+        { term: 'ccc', score: 0 }
+    ]);
+    // ineligible scores still sort last, whatever the key
+    t.strictSame(rankByDistance((q, term) => (term === 'skip' ? -1 : 0), 'q', ['skip', 'zz', 'y'], byLength), [
+        { term: 'y', score: 0 },
+        { term: 'zz', score: 0 },
+        { term: 'skip', score: -1 }
+    ]);
+    t.end();
+});
