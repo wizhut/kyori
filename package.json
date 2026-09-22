@@ -10,6 +10,19 @@
   "devDependencies": {
     "tap": "21.7.5"
   },
+  "engines": {
+    "node": ">=14.13.0"
+  },
+  "exports": {
+    ".": "./src/index.js",
+    "./methods/levensthein": "./src/methods/edit_distance/levensthein.js",
+    "./methods/damerau_levensthein": "./src/methods/edit_distance/damerau_levensthein.js",
+    "./methods/hamming": "./src/methods/edit_distance/hamming.js",
+    "./methods/jaro_winkler": "./src/methods/similarity/jaro_winkler.js",
+    "./methods/kyori": "./src/methods/similarity/kyori.js",
+    "./indices/kyori": "./src/indices/kyori.js",
+    "./package.json": "./package.json"
+  },
   "homepage": "https://github.com/wizhut/kyori#readme",
   "keywords": [
     "string edit distance",

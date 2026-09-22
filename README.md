@@ -55,6 +55,21 @@ Similarity / ranking family (native):
 
 ## Usage
 
+Import just the method you need:
+
+```javascript
+const { levensthein } = require('@wizhut_tech/kyori/methods/levensthein');
+const { kyori } = require('@wizhut_tech/kyori/methods/kyori');
+const { KyoriIndex } = require('@wizhut_tech/kyori/indices/kyori');
+```
+
+Every method listed above is reachable as `@wizhut_tech/kyori/methods/<name>`,
+using the same flat names the `methods` namespace uses -- the `edit_distance/`
+and `similarity/` split is an internal detail and does not appear in the path.
+The subpath form needs Node 14.13 or newer.
+
+The whole library is also available from a single root import:
+
 ```javascript
 const { methods, indices } = require('@wizhut_tech/kyori');
 ```
@@ -76,12 +91,15 @@ Shape:
 }
 ```
 
+Both forms hand back the same objects, so they mix freely. Shared internals
+(under `src/common/`) are deliberately not reachable as subpaths.
+
 ### Levensthein
 
 Definition: [Wikipedia](https://en.wikipedia.org/wiki/Levenshtein_distance) ↗.
 
 ```javascript
-const { methods: { levensthein } } = require('@wizhut_tech/kyori');
+const { levensthein } = require('@wizhut_tech/kyori/methods/levensthein');
 
 levensthein.distance('foo', 'foo')   // 0
 levensthein.distance('foo', 'food')  // 1
@@ -96,7 +114,7 @@ levensthein.distance('foo', null)    // -1
 Definition: [Wikipedia](https://en.wikipedia.org/wiki/Damerau–Levenshtein_distance) ↗.
 
 ```javascript
-const { methods: { damerau_levensthein } } = require('@wizhut_tech/kyori');
+const { damerau_levensthein } = require('@wizhut_tech/kyori/methods/damerau_levensthein');
 
 damerau_levensthein.distance('foo', 'foo')  // 0
 damerau_levensthein.distance('ab', 'ba')    // 1 (transposition)
@@ -109,7 +127,7 @@ Definition: [Wikipedia](https://en.wikipedia.org/wiki/Hamming_distance) ↗.
 Equal-length strings only.
 
 ```javascript
-const { methods: { hamming } } = require('@wizhut_tech/kyori');
+const { hamming } = require('@wizhut_tech/kyori/methods/hamming');
 
 hamming.distance('foo', 'foo')  // 0
 hamming.distance('foo', 'fob')  // 1
@@ -121,7 +139,7 @@ hamming.distance('foo', 'food') // -1
 Definition: [Wikipedia](https://en.wikipedia.org/wiki/Jaro–Winkler_distance) ↗.
 
 ```javascript
-const { methods: { jaro_winkler } } = require('@wizhut_tech/kyori');
+const { jaro_winkler } = require('@wizhut_tech/kyori/methods/jaro_winkler');
 
 jaro_winkler.similarity('foo', 'foo') // 1
 jaro_winkler.similarity('foo', 'bar') // 0
@@ -131,7 +149,7 @@ jaro_winkler.distance('foo', 'foo')   // 0  (1 − similarity)
 ### Kyori
 
 ```javascript
-const { methods: { kyori } } = require('@wizhut_tech/kyori');
+const { kyori } = require('@wizhut_tech/kyori/methods/kyori');
 
 // Ranking / autocomplete cost — lower is better
 kyori.distance('foo', 'foo')                          // 0
@@ -161,7 +179,7 @@ kyori.rank('art', ['cart', 'artist', 'art'])
 lowest first; ties broken lexicographically).
 
 ```javascript
-const { indices: { KyoriIndex } } = require('@wizhut_tech/kyori');
+const { KyoriIndex } = require('@wizhut_tech/kyori/indices/kyori');
 
 const index = new KyoriIndex();
 index.addMany(['cart', 'artist', 'art']);
