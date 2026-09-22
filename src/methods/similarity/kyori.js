@@ -176,8 +176,12 @@ function fn_distance(terms, text) {
     // edit distance) → score only those edits; the unread rest is free. Far
     // prefixes fall through to the token path so mid-string hits (e.g. "tikka"
     // in a longer title) are not beaten by unrelated same-initial distractors.
+    // Typos are tolerated from the third typed character on, as in Lucene's
+    // and Elasticsearch's fuzzy suggesters: none for 1-2 characters (where one
+    // edit would admit every candidate sharing the first letter), one for 3-5,
+    // two for 6-8, and so on.
     if (trTerm.length > 0 && trTerm[0] === trText[0]) {
-        const maxEdits = Math.max(1, Math.floor(trTerm.length / 3));
+        const maxEdits = Math.floor(trTerm.length / 3);
         const prefixDist = prefixEditDistance(trTerm, trText, maxEdits);
 
         if (prefixDist <= maxEdits) {

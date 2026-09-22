@@ -159,3 +159,18 @@ t.test('kyori/distance() typed prefix uses prefix edit distance', (t) => {
     t.ok(kyori.distance('xishwasher', 'dishwasher pods') > 1);
     t.end();
 });
+
+
+t.test('kyori/distance() no typo tolerance below three typed characters', (t) => {
+    // a two-letter prefix must match exactly; one edit would admit every
+    // candidate that shares the first letter
+    t.equal(kyori.distance('ab', 'abacus'), 0);
+    t.ok(kyori.distance('ab', 'ax pens') > 1);
+    t.ok(kyori.distance('ab', 'aqua shoes') > 1);
+    t.ok(kyori.distance('ab', 'abacus') < kyori.distance('ab', 'ax pens'));
+    t.equal(kyori.distance('a', 'apple'), 0);
+    // from three characters on, one typo is allowed
+    t.equal(kyori.distance('abc', 'abx pens'), 1);
+    t.equal(kyori.distance('fod', 'food'), 1);
+    t.end();
+});
