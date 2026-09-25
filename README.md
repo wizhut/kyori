@@ -197,6 +197,30 @@ index.search('art');
 // ]
 ```
 
+## Upgrading from 0.4.x
+
+0.5.0 changes the order `kyori.rank` returns and the value `kyori.distance`
+returns for some inputs. Nothing is renamed or removed; `kyori.rankKey` is
+new.
+
+- **`rank` and `KyoriIndex.search`** — candidates at the same distance are
+  ordered by length, shorter first, and only then alphabetically. In 0.4.x
+  the alphabet decided, and on a list that has already passed a prefix filter
+  that is most of the order: every completion of what was typed is at
+  distance 0.
+- **`distance` on a typed prefix** — the cost is the fewest edits between
+  what was typed and *any* prefix of the candidate, so a missed or doubled
+  letter costs 1 (`dishwaher` → `dishwasher pods`: 2 in 0.4.x) and the
+  candidate may be shorter than what was typed (`food` → `foo`: 2 in 0.4.x).
+- **`distance` on one or two typed characters** — a typo is tolerated from
+  the third typed character on: none for 1–2, one for 3–5, two for 6–8. A
+  two-letter prefix no longer costs 1 against every candidate that shares its
+  first letter (`ab` → `ax pens`: 1 in 0.4.x, 6 now).
+- **`rankKey(query, candidate)`** — the order `rank` sorts by, as one
+  number: `distance + len / (len + 1)`.
+
+`kyori.similarity` and every other method are unchanged.
+
 ## Upgrading from 0.2.x
 
 `kyori.similarity` changed meaning. In 0.2.x it returned the autocomplete
