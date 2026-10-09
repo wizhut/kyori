@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/wizhut/kyori/main/.github/kyori-icon.png" width="128" height="128" alt="Kyori">
+</p>
+
 # Kyori
 
 A library of string **distance**, **similarity**, and **rank** methods.
