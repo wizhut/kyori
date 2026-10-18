@@ -18,6 +18,11 @@ const PAIRS = [
     ['chore lo', 'chore list for wall', 1, 0.2, 1.95],
     ['dishwaher', 'dishwasher pods', 1, 0, 1.9375],
     ['food', 'foo', 1, 0, 1.75],
+    // transpositions inside the typed prefix: one OSA edit
+    ['teh', 'the', 1, 0, 1.75],
+    ['fodo', 'food', 1, 0, 1.8],
+    ['dishwahser', 'dishwasher pods', 1, 0, 1.9375],
+    ['recieve', 'receive mail', 1, 0, 1.9230769230769231],
     ['ab', 'ax pens', 6, 0, 6.875],
     ['hotel bel-air', 'bel-air hotel', 1, 1, 1.9285714285714286],
     ['art', 'cart', 5, 0, 5.8],
