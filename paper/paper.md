@@ -34,12 +34,10 @@ method scores each candidate against the typed text with four ordered rules
 over folded strings; it tolerates typing errors from the third typed character on,
 charges one point when the same words appear in another order, and breaks
 ties by length, shorter completions first. Every method exposes the same
-three functions, `similarity`, `distance` and `rank`, so methods are
-interchangeable. The library
+three functions, `similarity`, `distance` and `rank`. The library
 is published on npm as `@wizhut_tech/kyori` under the MIT licence,
 runs on Node.js 14.13 or later with one runtime dependency, and ships
-with 264 automated test assertions. Its name is the Japanese word for
-distance.
+with 264 automated test assertions.
 
 # Statement of need
 
@@ -74,12 +72,17 @@ QAC uses for ordering [@kyoriresearch].
 
 # State of the field
 
-In JavaScript, Talisman [@plique2020] archives similarity metrics, phonetic
-algorithms and stemmers for record linkage; natural [@natural] carries
-Levenshtein, Jaro–Winkler and Dice among its language-processing tools;
-fastest-levenshtein [@fastestlevenshtein] implements one metric. All return a pairwise score and say nothing about
-ordering a list. The typeahead libraries do order lists, each by one fixed
-policy: Fuse.js [@fusejs] weights a Bitap match [@baezayates1992] by its location and the field's length; fuzzysort
+Research has moved past the measures Kyori packages. Edit distance has no
+strongly subquadratic algorithm unless the strong exponential time
+hypothesis fails [@backurs2015]; entity matching is learned from the
+Magellan suites by neural models [@mudgal2018]; query auto-completion is
+generative, AmazonQAC built to benchmark language models at it
+[@everaert2024]. Applications still ship the hand-written measures. In
+JavaScript, Talisman [@plique2020], natural [@natural] and
+fastest-levenshtein [@fastestlevenshtein] return a pairwise score and say
+nothing about ordering a list. The typeahead libraries do order lists, each by one fixed
+policy: Fuse.js [@fusejs] weights a Bitap match [@baezayates1992] by its
+location and the field's length; fuzzysort
 [@fuzzysort] scores a subsequence match less the candidate's length;
 match-sorter [@matchsorter] sorts by tier (equal, starts-with,
 word-starts-with, contains, acronym, fuzzy), each tier alphabetical.
@@ -183,7 +186,7 @@ available only to the most popular completion.
 
 # Research impact statement
 
-The evidence of use is, so far, the author's own research. The library has
+The evidence of use is the author's own research. The library has
 been on npm since October 2024, through 21 versions to 0.5.1, with about
 1 000 registry downloads in the month to 26 September 2026; the repository
 has been public since September 2024 with its tests run on every push,
@@ -192,12 +195,10 @@ evaluation tree, the current one confirmed on the held-out split, and the tree i
 published with the library [@kyoriresearch]: the harness, the generators
 that adapt the Magellan entity-matching suites [@konda2016]
 and build the filter-derived pools, the significance tests, the efficiency
-benchmark, and the results file from which this paper and the public
-progress report take every number. The harness accepts
+benchmark, and the results file from which this paper takes every number. The harness accepts
 another ranker as one function from a query and a candidate to a sort key,
 so an unmeasured library can be added as a row under the same tie-aware
-protocol; that, rather than the method, is the part most likely to be
-reused. The finding concerns the field rather than Kyori:
+protocol, the part most likely to be reused. The finding concerns the field rather than Kyori:
 the order of a filtered autocomplete list comes from a length prior every
 competitive method carries, and popularity decides what that prior leaves
 tied.
@@ -223,7 +224,7 @@ the committed harness, none by a model.
 
 # Acknowledgements
 
-This work received no external funding; the library and its evaluation were
+No external funding; the library and its evaluation were
 developed at Wizhut, the author's company, which had no further role.
 AmazonQAC is used under its CDLA-Permissive-2.0 licence; the
 entity-matching suites are the Magellan and DeepMatcher mirrors of the
