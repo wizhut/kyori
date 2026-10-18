@@ -201,6 +201,28 @@ index.search('art');
 // ]
 ```
 
+## Upgrading from 0.5.x
+
+0.6.0 changes no result. Every value `kyori.distance`, `kyori.similarity`,
+`kyori.rankKey`, `kyori.rank` and `KyoriIndex.search` return is the one
+0.5.1 returned, for the same input; the test suite pins the worked examples,
+non-ASCII input and `null`/`undefined` to 0.5.1's values, and the research
+tree's ranking, distance and similarity tables are identical to three
+decimals. Nothing in the API is added, renamed or removed.
+
+What changed is speed. 0.5.x folded (transliterated, lower-cased, trimmed)
+and tokenised each string on every pair: `distance` folded both strings per
+call, `rankKey` folded the candidate a second time for its length, and
+`rank` folded the query once per candidate. 0.6.0 folds each string once per
+call — `rank` folds the query once and each candidate once — and reads the
+length tie-break off that fold; `KyoriIndex` folds each term when it is
+added, so `search` folds only the query; ASCII strings skip Unicode
+normalisation altogether. Measured in the research tree on the 11 607
+held-out AmazonQAC pools (median per query, one core of an Apple M4 Max), a
+`rankKey` sort went from 120 µs to 52 and `rank()` from 120 µs to 44; on
+long product names (Abt–Buy) from 21 ms to 16. The figures and the
+protocol are in its `RESULTS.md`, *Efficiency*.
+
 ## Upgrading from 0.4.x
 
 0.5.0 changes the order `kyori.rank` returns and the value `kyori.distance`
