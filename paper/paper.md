@@ -63,22 +63,21 @@ A JavaScript application that must order a filtered list chooses among
 libraries that each answer with one scalar meant for a different job: a
 pairwise similarity, an edit distance, or a typeahead score with one fixed
 policy and no published measurement of the order it produces. Application
-developers get the classic measures behind one contract and a ranking cost
-built for the order-after-filter step, deterministic and parameter-free;
-researchers get a method whose
+developers get the classic measures behind one contract and a ranking cost built for the order-after-filter step; researchers get a method whose
 every rule is traced to its precedent, and an evaluation tree
 that measures it, eleven alternatives and two ablations with the metrics
 QAC uses for ordering [@kyoriresearch].
 
 # State of the field
 
-Research has moved past the measures Kyori packages. Edit distance has no
-strongly subquadratic algorithm unless the strong exponential time
-hypothesis fails [@backurs2015]; entity matching is learned from the
-Magellan suites by neural models [@mudgal2018]; query auto-completion is
-generative, AmazonQAC built to benchmark language models at it
-[@everaert2024]. Applications still ship the hand-written measures. In
-JavaScript, Talisman [@plique2020], natural [@natural] and
+The turn to learned models has reached string comparison: entity matching
+is learned from the Magellan suites by neural models [@mudgal2018], and
+query auto-completion is generative, AmazonQAC a benchmark for language
+models [@everaert2024]; exact edit distance admits no strongly
+subquadratic algorithm unless the strong exponential time hypothesis fails
+[@backurs2015]. A deterministic method offers what a model does not: no
+training data, no parameters, an order a rule can explain. Applications
+still ship such measures. In JavaScript, Talisman [@plique2020], natural [@natural] and
 fastest-levenshtein [@fastestlevenshtein] return a pairwise score and say
 nothing about ordering a list. The typeahead libraries do order lists, each by one fixed
 policy: Fuse.js [@fusejs] weights a Bitap match [@baezayates1992] by its
@@ -107,16 +106,15 @@ and `rank`, one for each question asked of two strings: how many operations
 turn one into the other, a count, lower when better; what share of the two
 agrees, a proportion, higher when better; and which candidate comes first
 for a query, an order that owes nothing to the metric axioms. RapidFuzz
-[@rapidfuzz] exposes the first two for each of its metrics and leaves the
-third to a helper; here all three are the contract. A method with one of
+[@rapidfuzz] exposes the first two per metric and leaves the third to a
+helper; here all three are the contract. A method with one of
 the first two natively derives the other, and ineligible input, such as Hamming on unequal lengths, returns $-1$ and
 sorts last. Kyori's own method refuses the derivation. Its cost is not a
 metric (`distance('foo bar', 'foo')` is 7 and the reverse is 0) and it is 0
 for every candidate that begins with the typed text, so no similarity can
 be read off it; its `similarity` is instead the Jaccard index
 of the two folded word sets. Uniform names let a caller sort by the wrong
-function; the evaluation keeps that mistake as a row, and sorting by the
-similarity loses 0.13 in mean reciprocal rank (MRR) against the cost.
+function; the evaluation keeps that row, and sorting by the similarity loses 0.13 in mean reciprocal rank (MRR) against the cost.
 
 **Four rules, each with a precedent.** Both strings are folded first (Latin
 letters to ASCII, lower case, dashes to spaces, whitespace collapsed). With $q$ the folded query and $t$ the folded
@@ -134,8 +132,7 @@ word as match-sorter's tiers do, or its capped edit distance to the nearest
 candidate word when absent. `rank` sorts by the cost and then by length, shorter first, a
 preference Fuse.js, fuzzysort and `ORDER BY length` all carry; the
 alphabetical fallback after that is credited nowhere in the evaluation.
-It has no weights, learned parameters, frequency data or index, a
-deliberate trade: popularity is the strongest ordering signal in QAC
+It has no weights, frequency data or index, a deliberate trade: popularity is the strongest ordering signal in QAC
 [@baryossef2011], and Kyori leaves it to the caller, who has the logs.
 
 **What the measurement says.** The
@@ -150,7 +147,7 @@ is level with fuzzysort, Fuse.js and sorting by length, no difference
 surviving Holm correction over 19 paired tests; it leads match-sorter by
 0.028 and its own cost without the tie-break by 0.036 ($p < 0.01$ for
 both), and trails the most popular completion by 0.018.
-The design lost elsewhere, and those numbers stay in: as a resemblance
+The design lost elsewhere: as a resemblance
 score on product titles Kyori's token Jaccard trails a character-trigram
 cosine by 0.172 on Abt–Buy [@koepcke2010] and Soft-TFIDF by 0.063 on
 Amazon–Google [@cohen2003]; on misspellings [@norvig2009] its
@@ -192,8 +189,7 @@ been on npm since October 2024, through 21 versions to 0.5.1, with about
 has been public since September 2024 with its tests run on every push,
 one author and no external contributors yet. The method's seven versions were each measured by the
 evaluation tree, the current one confirmed on the held-out split, and the tree is
-published with the library [@kyoriresearch]: the harness, the generators
-that adapt the Magellan entity-matching suites [@konda2016]
+published with the library [@kyoriresearch]: the harness, the generators that adapt the Magellan suites [@konda2016]
 and build the filter-derived pools, the significance tests, the efficiency
 benchmark, and the results file from which this paper takes every number. The harness accepts
 another ranker as one function from a query and a candidate to a sort key,
@@ -212,9 +208,8 @@ assistance began in May 2026 and reached the code with release 0.2.0 in
 August 2026: Anthropic's Claude
 models through Claude Code, and the Cursor and Google Antigravity agents,
 contributed the native metrics that replaced Talisman, refactoring, test
-scaffolding, documentation and the release workflow, and in the evaluation
-tree the harness, the baseline implementations, the corpus adaptations, the
-significance tests and the efficiency benchmark. This manuscript was
+scaffolding, documentation and the release workflow, and in the evaluation tree the harness,
+baselines, corpus adaptations, significance tests and efficiency benchmark. This manuscript was
 drafted by Claude Fable 5.1 in Claude Code from the author's evaluation
 records and revised by the author. The problem framing, the three-contract
 design, the four rules and their constants, the evaluation protocol and the
