@@ -209,7 +209,7 @@ January 2025 (0.1.1), modelled on Talisman [@plique2020]: it wrapped
 Talisman's Damerau–Levenshtein and its tests followed Talisman's. AI
 assistance began in May 2026 and reached the code with release 0.2.0 in
 August 2026: Anthropic's Claude
-models through Claude Code and, for that release, Cursor's agent
+models through Claude Code, and the Cursor and Google Antigravity agents,
 contributed the native metrics that replaced Talisman, refactoring, test
 scaffolding, documentation and the release workflow, and in the evaluation
 tree the harness, the baseline implementations, the corpus adaptations, the
