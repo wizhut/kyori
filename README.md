@@ -242,6 +242,18 @@ kyori.distance(q, c)     // 0.3.0 — same behaviour, plus keyword-order
 ordered best-first. Every other method gained `similarity`, `distance`, and
 `rank` without changing what it already returned.
 
+## Support and contributing
+
+Kyori is maintained by one person, on a best-effort basis. Bugs, questions
+and proposals go to [GitHub Issues](https://github.com/wizhut/kyori/issues);
+the maintainer answers them, usually within a few days, but there is no
+service level and no guaranteed response time. Pull requests are welcome:
+[CONTRIBUTING.md](CONTRIBUTING.md) says how to report a problem, propose a
+change, run the tests (`npm test`) and how releases are cut. The ranking
+method's rules and constants are measured in a separate research tree,
+[wizhut/kyori-research](https://github.com/wizhut/kyori-research), before
+they ship.
+
 # License and usage
 
 Released under MIT license and maintained by [wizhut.tech](https://www.wizhut.tech) ↗.
