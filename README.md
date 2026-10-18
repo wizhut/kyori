@@ -21,10 +21,38 @@ Every method exposes the same three functions:
 | `distance(a, b)` | edit / cognitive cost | **lower** is better |
 | `rank(query, candidates)` | order a pool for a query | returns `{ term, score }[]` |
 
-Competitors derive the dual where needed (`distance ≈ 1 − similarity` for
-Jaro-Winkler; `similarity ≈ 1 − distance / maxLen` for edit metrics).
-Kyori keeps them **conceptually separate**: `distance` is the autocomplete /
-ranking cost; `similarity` is token-set Jaccard resemblance after fold.
+### Why three functions, and what happens if you pick the wrong one
+
+The three answer different questions. A **distance** counts the operations
+that turn one string into the other; lower is better. A **similarity** says
+what share of the two agrees; higher is better, and identical strings score 1.
+A **rank** puts a list of candidates in order for a query, and an order owes
+nothing to the metric axioms: it only has to be right. Metric libraries
+usually ship the first two for each metric (RapidFuzz does) and leave the
+third to the caller; here all three are the contract, so a metric can be
+swapped without touching the code around it.
+
+For the classic metrics the first two are duals, and each derives the other
+(`distance ≈ 1 − similarity` for Jaro-Winkler; `similarity ≈ 1 − distance / maxLen`
+for the edit distances). Kyori's own method refuses the derivation, on purpose:
+
+- `kyori.distance` is a ranking cost, not a metric. It is not symmetric
+  (`distance('foo bar', 'foo')` is 7 and the reverse is 0), and it is 0 for
+  every candidate that begins with the typed text, so no resemblance can be
+  read off it.
+- `kyori.similarity` is a different function: the share of words the two
+  strings have in common (token Jaccard after fold). It never looks at
+  characters, and it knows nothing about what was typed.
+
+So pick the function by the question. Order a list with `rank`, or sort by
+`distance`; measure resemblance with `similarity`. The names are uniform, so
+nothing stops you sorting an autocomplete list by `kyori.similarity`, and the
+evaluation keeps that mistake as a row: on 11,607 held-out AmazonQAC prefixes
+it scores 0.271 in mean reciprocal rank against 0.404 for the cost, a loss of
+0.13 (see the [Wizhut Research report](https://research.wizhut.tech/labs/kyori)).
+The reverse mistake, reading `kyori.distance` as a resemblance score, has no
+row because it cannot be made to mean anything: every prefix match reads as
+identical.
 
 Invalid or ineligible inputs return `-1` from `distance` / `similarity`
 where that metric defines it (e.g. Hamming on unequal lengths). `rank`
