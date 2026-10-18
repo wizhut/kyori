@@ -11,7 +11,7 @@ tags:
   - record linkage
 authors:
   - name: Vassilios Karakoidas
-    # orcid: 0000-0000-0000-0000  # AUTHOR: add your ORCID iD before submission, or delete this line
+    orcid: 0009-0001-2263-3453
     corresponding: true
     affiliation: 1
 affiliations:
@@ -28,11 +28,10 @@ classic edit distances of Levenshtein, Damerau–Levenshtein and Hamming and
 the Jaro–Winkler similarity, and adds a method of its own, also called
 Kyori, for a job those measures were not designed for: putting an
 autocomplete list in order. When a user types into a search box, the
-application narrows its catalogue to the entries that begin with the typed
-text and must then decide which survivors to show first. Kyori's
+application keeps the entries that begin with the typed text and must
+decide which to show first. Kyori's
 method scores each candidate against the typed text with four ordered rules
-over normalised strings (accents removed, case folded, hyphens treated as
-spaces); it tolerates typing errors from the third typed character on,
+over folded strings; it tolerates typing errors from the third typed character on,
 charges one point when the same words appear in another order, and breaks
 ties by length, shorter completions first. Every method exposes the same
 three functions, `similarity`, `distance` and `rank`, so methods are
@@ -50,7 +49,7 @@ Record linkage asks how much two names or titles resemble each other
 separate a mistyped word from the intended one [@damerau1964]; query
 auto-completion (QAC) asks in what order a list of completions should
 appear once the typed prefix has selected them [@baryossef2011].
-The measures form a lineage. Levenshtein counted insertions, deletions and
+Levenshtein counted insertions, deletions and
 substitutions [@levenshtein1966] and Damerau added the adjacent
 transposition [@damerau1964]; Jaro and Winkler rewarded agreeing characters
 and a shared prefix [@jaro1989; @winkler1990]; Jaccard's index compared
@@ -67,8 +66,8 @@ libraries that each answer with one scalar meant for a different job: a
 pairwise similarity, an edit distance, or a typeahead score with one fixed
 policy and no published measurement of the order it produces. Application
 developers get the classic measures behind one contract and a ranking cost
-built for the order-after-filter step, deterministic and parameter-free, so
-any order can be explained by its rule; researchers get a method whose
+built for the order-after-filter step, deterministic and parameter-free;
+researchers get a method whose
 every rule is traced to its precedent, and an evaluation tree
 that measures it, eleven alternatives and two ablations with the metrics
 QAC uses for ordering [@kyoriresearch].
@@ -125,12 +124,11 @@ characters agree, the typed-prefix rule returns the prefix edit distance,
 the least Damerau–Levenshtein distance between $q$ and any prefix of $t$
 [@chaudhuri2009], when it is within $\lfloor |q|/3 \rfloor$ edits,
 none below three typed characters; the threshold and the fixed first
-character are those of Lucene's and Elasticsearch's suggesters, which cap
+character are those of Lucene's suggesters, which cap
 the allowance at two where Kyori lets it grow. Otherwise the cost is the length gap plus, for each typed word, its
 displacement from where it was typed, preferring an occurrence that starts a
 word as match-sorter's tiers do, or its capped edit distance to the nearest
-candidate word when absent. Only that formula and the constants are Kyori's
-own. `rank` sorts by the cost and then by length, shorter first, a
+candidate word when absent. `rank` sorts by the cost and then by length, shorter first, a
 preference Fuse.js, fuzzysort and `ORDER BY length` all carry; the
 alphabetical fallback after that is credited nowhere in the evaluation.
 It has no weights, learned parameters, frequency data or index, a
@@ -162,8 +160,12 @@ and more slowly; the order that remains belongs to popularity.
 
 : Expected MRR on the held-out AmazonQAC pools ($n = 11\,607$), the band a
 tie policy alone could move it within, and the share of cases in which the
-intended completion is tied. Popularity is available only to the most
-popular completion.
+intended completion is tied. The ranking task alone: every contestant is
+used as the sort key its contract gives, distances ascending and
+similarities descending, so the distance and similarity rows show what
+sorting a filtered list by those functions costs, not how well they do
+their own job; those tasks are reported in the text. Popularity is
+available only to the most popular completion.
 
 | Method                          |   MRR | Band        | Ties |
 |:--------------------------------|------:|:-----------:|-----:|
@@ -202,18 +204,22 @@ tied.
 
 # AI usage disclosure
 
-Generative AI was used as follows. Anthropic's Claude
-models, through the Claude Code tool, assisted the development of the
-library with refactoring, test scaffolding, documentation and the release
-workflow, and of the evaluation tree with the harness, the baseline
-implementations, the corpus adaptations, the significance tests and the
-efficiency benchmark. This manuscript was drafted by Claude Fable 5.1 in
-Claude Code from the author's evaluation records and revised by the author.
-The problem framing, the three-contract design, the four rules and their
-constants, the evaluation protocol and the reading of every result are the
-author's decisions. The author reviewed, ran and edited every AI-assisted
-output; every number here is produced by the committed harness, none by a
-model.
+Kyori was written without generative AI from September 2024 (0.0.1) to
+January 2025 (0.1.1), modelled on Talisman [@plique2020]: it wrapped
+Talisman's Damerau–Levenshtein and its tests followed Talisman's. AI
+assistance began in May 2026 and reached the code with release 0.2.0 in
+August 2026: Anthropic's Claude
+models through Claude Code and, for that release, Cursor's agent
+contributed the native metrics that replaced Talisman, refactoring, test
+scaffolding, documentation and the release workflow, and in the evaluation
+tree the harness, the baseline implementations, the corpus adaptations, the
+significance tests and the efficiency benchmark. This manuscript was
+drafted by Claude Fable 5.1 in Claude Code from the author's evaluation
+records and revised by the author. The problem framing, the three-contract
+design, the four rules and their constants, the evaluation protocol and the
+reading of every result are the author's decisions. The author reviewed,
+ran and edited every AI-assisted output; every number here is produced by
+the committed harness, none by a model.
 
 # Acknowledgements
 
