@@ -46,10 +46,10 @@ distance.
 
 Three tasks share the vocabulary of closeness and are not the same task.
 Record linkage asks how much two names or titles resemble each other
-[@fellegi1969; @christen2012]; spelling correction asks how many edits
+[@fellegi1969]; spelling correction asks how many edits
 separate a mistyped word from the intended one [@damerau1964]; query
 auto-completion (QAC) asks in what order a list of completions should
-appear once the typed prefix has selected them [@baryossef2011; @cai2016].
+appear once the typed prefix has selected them [@baryossef2011].
 The measures form a lineage. Levenshtein counted insertions, deletions and
 substitutions [@levenshtein1966] and Damerau added the adjacent
 transposition [@damerau1964]; Jaro and Winkler rewarded agreeing characters
@@ -59,8 +59,8 @@ the family by how well each ranks the true match among candidates
 [@cohen2003], the protocol Kyori's evaluation adopts. Autocompletion added
 the most popular completion over a prefix tree [@baryossef2011] and error
 tolerance through the edit distance between the typed text and a prefix of
-each completion [@chaudhuri2009; @ji2009], shipped by Lucene and
-Elasticsearch as fuzzy suggesters [@lucene3846; @elasticsearch].
+each completion [@chaudhuri2009], shipped by Lucene and
+Elasticsearch as fuzzy suggesters [@lucene3846].
 
 A JavaScript application that must order a filtered list chooses among
 libraries that each answer with one scalar meant for a different job: a
@@ -80,8 +80,7 @@ algorithms and stemmers for record linkage; natural [@natural] carries
 Levenshtein, Jaro–Winkler and Dice among its language-processing tools;
 fastest-levenshtein [@fastestlevenshtein] implements one metric. All return a pairwise score and say nothing about
 ordering a list. The typeahead libraries do order lists, each by one fixed
-policy: Fuse.js [@fusejs] weights a Bitap match [@baezayates1992;
-@wumanber1992] by its location and the field's length; fuzzysort
+policy: Fuse.js [@fusejs] weights a Bitap match [@baezayates1992] by its location and the field's length; fuzzysort
 [@fuzzysort] scores a subsequence match less the candidate's length;
 match-sorter [@matchsorter] sorts by tier (equal, starts-with,
 word-starts-with, contains, acronym, fuzzy), each tier alphabetical.
@@ -119,7 +118,7 @@ words in another order cost 1, where sorted-Winkler [@christen2006] and
 FuzzyWuzzy's token sort [@fuzzywuzzy] charge nothing. If the first
 characters agree, the typed-prefix rule returns the prefix edit distance,
 the least Damerau–Levenshtein distance between $q$ and any prefix of $t$
-[@chaudhuri2009; @ji2009], when it is within $\lfloor |q|/3 \rfloor$ edits,
+[@chaudhuri2009], when it is within $\lfloor |q|/3 \rfloor$ edits,
 none below three typed characters; the threshold and the fixed first
 character are those of Lucene's and Elasticsearch's suggesters, which cap
 the allowance at two where Kyori lets it grow. Otherwise the cost is the length gap plus, for each typed word, its
@@ -148,7 +147,7 @@ both), and trails the most popular completion by 0.018.
 The design lost elsewhere, and those numbers stay in: as a resemblance
 score on product titles Kyori's token Jaccard trails a character-trigram
 cosine by 0.172 on Abt–Buy [@koepcke2010] and Soft-TFIDF by 0.063 on
-Amazon–Google [@cohen2003]; on misspellings [@mitton1987; @norvig2009] its
+Amazon–Google [@cohen2003]; on misspellings [@norvig2009] its
 cost trails Jaro–Winkler by 0.058; and it is the slowest string key after
 Soft-TFIDF, 120 µs a query at the median against 17 to 26 µs for fuzzysort
 and sorting by length, on one core of an Apple M4 Max under Node.js 26.8,
@@ -184,7 +183,7 @@ has been public since September 2024 with the tests run in the release
 workflow, one author and no external contributors yet. The method's seven versions were each measured by the
 evaluation tree, the current one confirmed on the held-out split, and the tree is
 published with the library [@kyoriresearch]: the harness, the generators
-that adapt the Magellan entity-matching suites [@konda2016; @mudgal2018]
+that adapt the Magellan entity-matching suites [@konda2016]
 and build the filter-derived pools, the significance tests, the efficiency
 benchmark, and the results file from which this paper and the public
 progress report [@kyorireport] take every number. The harness accepts
