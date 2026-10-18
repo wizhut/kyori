@@ -36,7 +36,7 @@ charges one point when the same words appear in another order, and breaks
 ties by length, shorter completions first. Every method exposes the same
 three functions, `similarity`, `distance` and `rank`, so methods are
 interchangeable. The library
-is published on npm as `@wizhut_tech/kyori` under the MIT licence [@kyori],
+is published on npm as `@wizhut_tech/kyori` under the MIT licence,
 runs on Node.js 14.13 or later with one runtime dependency, and ships
 with 264 automated test assertions. Its name is the Japanese word for
 distance.
@@ -193,7 +193,7 @@ published with the library [@kyoriresearch]: the harness, the generators
 that adapt the Magellan entity-matching suites [@konda2016]
 and build the filter-derived pools, the significance tests, the efficiency
 benchmark, and the results file from which this paper and the public
-progress report [@kyorireport] take every number. The harness accepts
+progress report take every number. The harness accepts
 another ranker as one function from a query and a candidate to a sort key,
 so an unmeasured library can be added as a row under the same tie-aware
 protocol; that, rather than the method, is the part most likely to be
