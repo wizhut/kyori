@@ -38,7 +38,7 @@ ties by length, shorter completions first. Every method exposes the same
 three functions, `similarity`, `distance` and `rank`, so methods are
 interchangeable. The library
 is published on npm as `@wizhut_tech/kyori` under the MIT licence [@kyori],
-runs on Node.js 14.13 or later with one small runtime dependency, and ships
+runs on Node.js 14.13 or later with one runtime dependency, and ships
 with 264 automated test assertions. Its name is the Japanese word for
 distance.
 
@@ -68,8 +68,8 @@ pairwise similarity, an edit distance, or a typeahead score with one fixed
 policy and no published measurement of the order it produces. Application
 developers get the classic measures behind one contract and a ranking cost
 built for the order-after-filter step, deterministic and parameter-free, so
-any order can be explained by its rule; researchers who compare string
-rankers get a method whose every rule is traced to its precedent, and an evaluation tree
+any order can be explained by its rule; researchers get a method whose
+every rule is traced to its precedent, and an evaluation tree
 that measures it, eleven alternatives and two ablations with the metrics
 QAC uses for ordering [@kyoriresearch].
 
@@ -100,9 +100,14 @@ matches what users chose.
 
 # Software design
 
-**Three contracts.** Every method module exports `distance` (lower is
-better), `similarity` (higher is better) and `rank`. A method with one of the first two natively derives the other,
-and ineligible input, such as Hamming on unequal lengths, returns $-1$ and
+**Three contracts.** Every method module exports `distance`, `similarity`
+and `rank`, one for each question asked of two strings: how many operations
+turn one into the other, a count, lower when better; what share of the two
+agrees, a proportion, higher when better; and which candidate comes first
+for a query, an order that owes nothing to the metric axioms. RapidFuzz
+[@rapidfuzz] exposes the first two for each of its metrics and leaves the
+third to a helper; here all three are the contract. A method with one of
+the first two natively derives the other, and ineligible input, such as Hamming on unequal lengths, returns $-1$ and
 sorts last. Kyori's own method refuses the derivation. Its cost is not a
 metric (`distance('foo bar', 'foo')` is 7 and the reverse is 0) and it is 0
 for every candidate that begins with the typed text, so no similarity can
@@ -128,7 +133,7 @@ candidate word when absent. Only that formula and the constants are Kyori's
 own. `rank` sorts by the cost and then by length, shorter first, a
 preference Fuse.js, fuzzysort and `ORDER BY length` all carry; the
 alphabetical fallback after that is credited nowhere in the evaluation.
-There are no weights, learned parameters, frequency data or index, a
+It has no weights, learned parameters, frequency data or index, a
 deliberate trade: popularity is the strongest ordering signal in QAC
 [@baryossef2011], and Kyori leaves it to the caller, who has the logs.
 
@@ -179,8 +184,8 @@ popular completion.
 The evidence of use is, so far, the author's own research. The library has
 been on npm since October 2024, through 21 versions to 0.5.1, with about
 1 000 registry downloads in the month to 26 September 2026; the repository
-has been public since September 2024 with the tests run in the release
-workflow, one author and no external contributors yet. The method's seven versions were each measured by the
+has been public since September 2024 with its tests run on every push,
+one author and no external contributors yet. The method's seven versions were each measured by the
 evaluation tree, the current one confirmed on the held-out split, and the tree is
 published with the library [@kyoriresearch]: the harness, the generators
 that adapt the Magellan entity-matching suites [@konda2016]
