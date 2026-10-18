@@ -1,0 +1,55 @@
+// The Kyori method interface and what implements it (UML class diagram).
+// Render: make api.png  (dot -Tpng -Gdpi=220 api.dot -o api.png)
+digraph api {
+  graph [rankdir=BT, nodesep=0.35, ranksep=0.9, fontname="Helvetica", bgcolor="white", pad=0.2];
+  node  [shape=plain, fontname="Helvetica", fontsize=11];
+  edge  [fontname="Helvetica", fontsize=10];
+
+  Method [label=<
+    <table border="1" cellborder="0" cellspacing="0" cellpadding="5">
+      <tr><td align="center"><font point-size="9">«interface»</font><br/><b>Method</b></td></tr>
+      <hr/>
+      <tr><td align="left" balign="left">+ distance(a, b) : number<br/>+ similarity(a, b) : number<br/>+ rank(query, candidates) : {term, score}[]<br/></td></tr>
+    </table>>];
+
+  levensthein [label=<
+    <table border="1" cellborder="0" cellspacing="0" cellpadding="5">
+      <tr><td><b>levensthein</b></td></tr><hr/>
+      <tr><td align="left" balign="left">distance: native<br/>similarity = 1 − d / max<br/>rank: by distance<br/></td></tr>
+    </table>>];
+  damerau [label=<
+    <table border="1" cellborder="0" cellspacing="0" cellpadding="5">
+      <tr><td><b>damerau_levensthein</b></td></tr><hr/>
+      <tr><td align="left" balign="left">distance: native (OSA)<br/>similarity = 1 − d / max<br/>rank: by distance<br/></td></tr>
+    </table>>];
+  hamming [label=<
+    <table border="1" cellborder="0" cellspacing="0" cellpadding="5">
+      <tr><td><b>hamming</b></td></tr><hr/>
+      <tr><td align="left" balign="left">distance: native, −1 if |a| ≠ |b|<br/>similarity = 1 − d / max<br/>rank: by distance<br/></td></tr>
+    </table>>];
+  jw [label=<
+    <table border="1" cellborder="0" cellspacing="0" cellpadding="5">
+      <tr><td><b>jaro_winkler</b></td></tr><hr/>
+      <tr><td align="left" balign="left">similarity: native<br/>distance = 1 − s<br/>rank: by similarity<br/></td></tr>
+    </table>>];
+  kyori [label=<
+    <table border="1" cellborder="0" cellspacing="0" cellpadding="5">
+      <tr><td><b>kyori</b></td></tr><hr/>
+      <tr><td align="left" balign="left">distance: native, the ranking cost<br/>similarity: native, token Jaccard<br/>rank: by distance, then length<br/></td></tr><hr/>
+      <tr><td align="left" balign="left">+ rankKey(query, candidate) : number<br/></td></tr>
+    </table>>];
+  index [label=<
+    <table border="1" cellborder="0" cellspacing="0" cellpadding="5">
+      <tr><td><b>KyoriIndex</b></td></tr><hr/>
+      <tr><td align="left" balign="left">− terms : string[]<br/></td></tr><hr/>
+      <tr><td align="left" balign="left">+ addOne(term), addMany(terms)<br/>+ count() : number<br/>+ search(query) : {term, score}[]<br/></td></tr>
+    </table>>];
+
+  // realisations
+  edge [style=dashed, arrowhead=empty, arrowsize=1.2];
+  levensthein -> Method; damerau -> Method; hamming -> Method; jw -> Method; kyori -> Method;
+  // dependency
+  edge [style=dashed, arrowhead=vee, arrowsize=0.9, label="  «uses» rank"];
+  index -> kyori;
+  { rank=same; levensthein; damerau; hamming; jw; kyori; }
+}

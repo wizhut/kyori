@@ -83,8 +83,7 @@ nothing about ordering a list. The typeahead libraries do order lists, each by o
 policy: Fuse.js [@fusejs] weights a Bitap match [@baezayates1992] by its
 location and the field's length; fuzzysort
 [@fuzzysort] scores a subsequence match less the candidate's length;
-match-sorter [@matchsorter] sorts by tier (equal, starts-with,
-word-starts-with, contains, acronym, fuzzy), each tier alphabetical.
+match-sorter [@matchsorter] sorts by tier, each tier alphabetical.
 Outside JavaScript the division holds: RapidFuzz [@rapidfuzz] and
 stringdist [@vanderloo2014] are metric collections; pg_trgm [@pgtrgm] and
 the Lucene and Elasticsearch suggesters are fixed-policy rankers inside a
@@ -101,8 +100,9 @@ matches what users chose.
 
 # Software design
 
-**Three contracts.** Every method module exports `distance`, `similarity`
-and `rank`, one for each question asked of two strings: how many operations
+Every method module implements the interface in \autoref{fig:api}:
+`distance`, `similarity` and `rank`, one for each question asked of two
+strings: how many operations
 turn one into the other, a count, lower when better; what share of the two
 agrees, a proportion, higher when better; and which candidate comes first
 for a query, an order that owes nothing to the metric axioms. RapidFuzz
@@ -116,7 +116,9 @@ be read off it; its `similarity` is instead the Jaccard index
 of the two folded word sets. Uniform names let a caller sort by the wrong
 function; the evaluation keeps that row, and sorting by the similarity loses 0.13 in mean reciprocal rank (MRR) against the cost.
 
-**Four rules, each with a precedent.** Both strings are folded first (Latin
+![The method interface and its implementations.\label{fig:api}](api.png)
+
+The cost has four rules, each with a precedent. Both strings are folded first (Latin
 letters to ASCII, lower case, dashes to spaces, whitespace collapsed). With $q$ the folded query and $t$ the folded
 candidate, the first rule that applies returns. Identity costs 0. The same
 words in another order cost 1, where sorted-Winkler [@christen2006] and
@@ -135,8 +137,7 @@ alphabetical fallback after that is credited nowhere in the evaluation.
 It has no weights, frequency data or index, a deliberate trade: popularity is the strongest ordering signal in QAC
 [@baryossef2011], and Kyori leaves it to the caller, who has the logs.
 
-**What the measurement says.** The
-evaluation tree scores every contestant through the matching contract on
+The evaluation tree scores every contestant through the matching contract on
 eight groups from six public datasets, one held out from the design: a
 20 000-row sample of the AmazonQAC train split
 [@everaert2024], with pools that are exactly what a typo-tolerant prefix
