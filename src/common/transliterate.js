@@ -29,10 +29,18 @@ const SPECIALS = {
     'ſ': 's'
 };
 
+const NON_ASCII = /[^\x00-\x7F]/;
+
 
 function transliterate(str) {
     if (typeof str !== 'string') {
         str = String(str);
+    }
+
+    // ASCII is its own NFD form, has no combining marks and no entry in
+    // SPECIALS, so the loop below would copy it character by character.
+    if (!NON_ASCII.test(str)) {
+        return str;
     }
 
     const nfd = str.normalize('NFD');
