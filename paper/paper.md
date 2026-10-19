@@ -25,8 +25,7 @@ bibliography: paper.bib
 
 Kyori is a JavaScript library for comparing strings. It implements the
 classic edit distances of Levenshtein, Damerau–Levenshtein and Hamming and
-the Jaro–Winkler similarity, and adds a method of its own, also called
-Kyori, for a job those measures were not designed for: putting an
+the Jaro–Winkler similarity, and adds a method of its own, also called Kyori, for putting an
 autocomplete list in order. When a user types into a search box, the
 application keeps the entries that begin with the typed text and must
 decide which to show first. Kyori's
@@ -56,8 +55,7 @@ the family by how well each ranks the true match among candidates
 [@cohen2003], the protocol Kyori's evaluation adopts. Autocompletion added
 the most popular completion over a prefix tree [@baryossef2011] and error
 tolerance through the edit distance between the typed text and a prefix of
-each completion [@chaudhuri2009], shipped by Lucene and
-Elasticsearch as fuzzy suggesters [@lucene3846].
+each completion [@chaudhuri2009], shipped by Lucene as a fuzzy suggester [@lucene3846].
 
 A JavaScript application that must order a filtered list chooses among
 libraries that each answer with one scalar meant for a different job: a
@@ -79,24 +77,25 @@ subquadratic algorithm unless the strong exponential time hypothesis fails
 training data, no parameters, an order a rule can explain. Applications
 still ship such measures. In JavaScript, Talisman [@plique2020], natural [@natural] and
 fastest-levenshtein [@fastestlevenshtein] return a pairwise score and say
-nothing about ordering a list. The typeahead libraries do order lists, each by one fixed
-policy: Fuse.js [@fusejs] weights a Bitap match [@baezayates1992] by its
+nothing about ordering a list. The typeahead libraries order lists, each by one policy: Fuse.js [@fusejs] weights a Bitap match [@baezayates1992] by its
 location and the field's length; fuzzysort
 [@fuzzysort] scores a subsequence match less the candidate's length;
 match-sorter [@matchsorter] sorts by tier, each tier alphabetical.
 Outside JavaScript the division holds: RapidFuzz [@rapidfuzz] and
-stringdist [@vanderloo2014] are metric collections; pg_trgm [@pgtrgm] and
-the Lucene and Elasticsearch suggesters are fixed-policy rankers inside a
-search engine.
+stringdist [@vanderloo2014] are metric collections; pg_trgm [@pgtrgm] and the Lucene and Elasticsearch suggesters rank inside a
+search engine. The hosted engines Algolia [@algolia2026], Meilisearch
+[@meilisearch2026] and Typesense [@typesense2026] rank by a ladder of
+criteria with the typo count at or near its top, a per-word allowance
+capped at two, and the remaining ties to weight or a custom order.
 
 Kyori was built rather than contributed: the metric libraries have no
-ranking contract to extend, and the typeahead libraries embed one scoring
-policy behind their own filter, so another tie policy is a different
-library, not a patch. What it adds is small: three contracts kept apart; a
-ranking cost of four rules borrowed from named prior work, only their
-arrangement, constants and fallback formula its own; and, alone among them
-as far as the author knows, a published measurement of how well its order
-matches what users chose.
+ranking contract to extend, and the typeahead libraries embed one policy
+behind their own filter. What it adds is small. Its cost is a ladder of
+the engines' kind with three differences: the allowance grows with the
+typed length where theirs stop at two, no popularity or weight term sits
+in it, and the ties it leaves fall to length, shorter first. Among the
+JavaScript libraries, as far as the author knows, it alone publishes a
+measurement of its order.
 
 # Software design
 
@@ -107,14 +106,14 @@ turn one into the other, a count, lower when better; what share of the two
 agrees, a proportion, higher when better; and which candidate comes first
 for a query, an order that owes nothing to the metric axioms. RapidFuzz
 [@rapidfuzz] exposes the first two per metric and leaves the third to a
-helper; here all three are the contract. A method with one of
-the first two natively derives the other, and ineligible input, such as Hamming on unequal lengths, returns $-1$ and
-sorts last. Kyori's own method refuses the derivation. Its cost is not a
+helper; here all three are the contract. A method with one of the first two derives the other; ineligible input,
+such as Hamming on unequal lengths, sorts last. Kyori's own method refuses the derivation. Its cost is not a
 metric (`distance('foo bar', 'foo')` is 7 and the reverse is 0) and it is 0
 for every candidate that begins with the typed text, so no similarity can
 be read off it; its `similarity` is instead the Jaccard index
 of the two folded word sets. Uniform names let a caller sort by the wrong
-function; the evaluation keeps that row, and sorting by the similarity loses 0.13 in mean reciprocal rank (MRR) against the cost.
+function; the evaluation keeps that row, 0.13 of mean reciprocal rank (MRR) below
+the cost.
 
 ![The method interface and its implementations.\label{fig:api}](api.png)
 
@@ -126,9 +125,7 @@ FuzzyWuzzy's token sort [@fuzzywuzzy] charge nothing. If the first
 characters agree, the typed-prefix rule returns the prefix edit distance,
 the least Damerau–Levenshtein distance between $q$ and any prefix of $t$
 [@chaudhuri2009], when it is within $\lfloor |q|/3 \rfloor$ edits,
-none below three typed characters; the threshold and the fixed first
-character are those of Lucene's suggesters, which cap
-the allowance at two where Kyori lets it grow. Otherwise the cost is the length gap plus, for each typed word, its
+none below three typed characters; the threshold and the fixed first character are Lucene's suggester's. Otherwise the cost is the length gap plus, for each typed word, its
 displacement from where it was typed, preferring an occurrence that starts a
 word as match-sorter's tiers do, or its capped edit distance to the nearest
 candidate word when absent. `rank` sorts by the cost and then by length, shorter first, a
@@ -188,14 +185,12 @@ The evidence of use is the author's own research. The library has
 been on npm since October 2024, through 22 versions to 0.6.0, with about
 700 registry downloads in the month to 16 October 2026; the repository
 has been public since September 2024 with its tests run on every push,
-one author and no external contributors yet. The method's seven versions were each measured by the
-evaluation tree, the current one confirmed on the held-out split, and the tree is
-published with the library [@kyoriresearch]: the harness, the generators that adapt the Magellan suites [@konda2016]
+one author and no external contributors yet. The method's seven versions were each measured by the evaluation tree,
+and the tree is published with the library [@kyoriresearch]: the harness, the generators that adapt the Magellan suites [@konda2016]
 and build the filter-derived pools, the significance tests, the efficiency
-benchmark, and the results file from which this paper takes every number. The harness accepts
-another ranker as one function from a query and a candidate to a sort key,
-so an unmeasured library can be added as a row under the same tie-aware
-protocol, the part most likely to be reused. The finding concerns the field rather than Kyori:
+benchmark, and the results file from which this paper takes every number. The harness takes another ranker as one function from query and
+candidate to a sort key, so an unmeasured library can be added as a row,
+the part most likely to be reused. The finding concerns the field rather than Kyori:
 the order of a filtered autocomplete list comes from a length prior every
 competitive method carries, and popularity decides what that prior leaves
 tied.
