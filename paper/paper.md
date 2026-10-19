@@ -37,7 +37,7 @@ ties by length, shorter completions first. Every method exposes the same
 three functions, `similarity`, `distance` and `rank`. The library
 is published on npm as `@wizhut_tech/kyori` under the MIT licence,
 runs on Node.js 14.13 or later with one runtime dependency, and ships
-with 264 automated test assertions.
+with 404 test assertions.
 
 # Statement of need
 
@@ -143,7 +143,7 @@ eight groups from six public datasets, one held out from the design: a
 [@everaert2024], with pools that are exactly what a typo-tolerant prefix
 filter returns, nothing planted or sampled [@krichene2020]. Ties are scored
 as expectations under random order [@mcsherry2008] and reported with the
-band a tie policy alone could move. Held out (table below), Kyori's `rank`
+band a tie policy alone could move. Held out, Kyori's `rank`
 is level with fuzzysort, Fuse.js and sorting by length, no difference
 surviving Holm correction over 19 paired tests; it leads match-sorter by
 0.028 and its own cost without the tie-break by 0.036 ($p < 0.01$ for
@@ -152,10 +152,10 @@ The design lost elsewhere: as a resemblance
 score on product titles Kyori's token Jaccard trails a character-trigram
 cosine by 0.172 on Abt–Buy [@koepcke2010] and Soft-TFIDF by 0.063 on
 Amazon–Google [@cohen2003]; on misspellings [@norvig2009] its
-cost trails Jaro–Winkler by 0.058; and it is the slowest string key after
-Soft-TFIDF, 120 µs a query at the median against 17 to 26 µs for fuzzysort
-and sorting by length, on one core of an Apple M4 Max under Node.js 26.8,
-three quarters of it in string folding. A cost assembled from known parts
+cost trails Jaro–Winkler by 0.058; and it is slow: 0.5.1 took 120 µs a query at the median, three quarters
+of it folding strings, and 0.6.0, folding each string once, takes 52,
+against 19 to 27 µs for fuzzysort and sorting by length on one core of an
+Apple M4 Max under Node.js 26.8. A cost assembled from known parts
 orders a filtered list as well as what applications already use, no better
 and more slowly; the order that remains belongs to popularity.
 
@@ -185,8 +185,8 @@ available only to the most popular completion.
 # Research impact statement
 
 The evidence of use is the author's own research. The library has
-been on npm since October 2024, through 21 versions to 0.5.1, with about
-1 000 registry downloads in the month to 26 September 2026; the repository
+been on npm since October 2024, through 22 versions to 0.6.0, with about
+700 registry downloads in the month to 16 October 2026; the repository
 has been public since September 2024 with its tests run on every push,
 one author and no external contributors yet. The method's seven versions were each measured by the
 evaluation tree, the current one confirmed on the held-out split, and the tree is
