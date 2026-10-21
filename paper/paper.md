@@ -183,7 +183,7 @@ available only to the most popular completion.
 
 The evidence of use is the author's own research. The library has
 been on npm since October 2024, through 22 versions to 0.6.0, with about
-700 registry downloads in the month to 16 October 2026; the repository
+870 registry downloads in the month to 18 October 2026; the repository
 has been public since September 2024 with its tests run on every push,
 one author and no external contributors yet. The method's seven versions were each measured by the evaluation tree,
 and the tree is published with the library [@kyoriresearch]: the harness, the generators that adapt the Magellan suites [@konda2016]
