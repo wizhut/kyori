@@ -37,12 +37,15 @@ For the classic metrics the first two are duals, and each derives the other
 for the edit distances). Kyori's own method refuses the derivation, on purpose:
 
 - `kyori.distance` is a ranking cost, not a metric. It is not symmetric
-  (`distance('foo bar', 'foo')` is 7 and the reverse is 0), and it is 0 for
+  (`distance('foo bar', 'foo')` is 14 and the reverse is 0), and it is 0 for
   every candidate that begins with the typed text, so no resemblance can be
   read off it.
 - `kyori.similarity` is a different function: the share of words the two
   strings have in common (token Jaccard after fold). It never looks at
-  characters, and it knows nothing about what was typed.
+  characters, and it knows nothing about what was typed. The cost's last
+  rule also reads words, but from the typed side only, with a typo
+  tolerance and ranked below every typed-prefix match; neither function is
+  derived from the other.
 
 So pick the function by the question. Order a list with `rank`, or sort by
 `distance`; measure resemblance with `similarity`. The names are uniform, so
@@ -83,7 +86,7 @@ Edit-distance family (native):
 Similarity / ranking family (native):
 
 * **Jaro-Winkler**: short-string resemblance (names); higher similarity is better.
-* **Kyori**: token-sensitive **ranking** cost for autocomplete. Matching is case-insensitive, folds Latin diacritics, treats hyphens as spaces, prefers word-prefix hits over infix, falls back to Damerau-Levenshtein for typos, charges a flat 1 for the same keywords in a different order, and for typed-prefix completions charges only the edits between what was typed and the closest prefix of the candidate (prefix edit distance, first character fixed, typos tolerated from the third typed character on). Use **`kyori.distance`** / **`kyori.rank`** for ordering (**lower** distance is better); `rank` sorts by distance, then by length (shorter completion first), then alphabetically, and **`kyori.rankKey`** is that order as one number. Use **`kyori.similarity`** for pairwise token Jaccard (**higher** is better).
+* **Kyori**: token-sensitive **ranking** cost for autocomplete. Matching is case-insensitive, folds Latin diacritics, treats hyphens as spaces, charges a flat 1 for the same keywords in a different order, for typed-prefix completions charges only the edits between what was typed and the closest prefix of the candidate (prefix edit distance, first character fixed, typos tolerated from the third typed character on), and for everything else counts the typed words the candidate lacks — a word is lacking when no word of the candidate starts with it, a typo away — ranked below every typed-prefix completion, so a candidate's length never counts against it. Use **`kyori.distance`** / **`kyori.rank`** for ordering (**lower** distance is better); `rank` sorts by distance, then by length (shorter completion first), then alphabetically, and **`kyori.rankKey`** is that order as one number. Use **`kyori.similarity`** for pairwise token Jaccard (**higher** is better).
 
 ## Usage
 
@@ -188,7 +191,9 @@ kyori.distance('foo', 'foo')                          // 0
 kyori.distance('foo', 'food')                         // 0 (typed prefix; unread suffix free)
 kyori.distance('chore lo', 'chore list for wall')     // 1
 kyori.distance('hotel bel-air', 'bel-air hotel')      // 1 (same keywords, order)
-kyori.distance('foo', 'ifoo')                         // 5 (not a word prefix)
+kyori.distance('pizza', 'margherita pizza')           // 2 (a later word: the tier above prefix matches)
+kyori.distance('foo', 'ifoo')                         // 7 (not a word prefix: one edit to a word that has it)
+kyori.distance('foo bar', 'foo')                      // 14 (one typed word lacking)
 kyori.distance('fod', 'food')                         // 1 (typed-prefix typo)
 kyori.distance('dishwaher', 'dishwasher pods')       // 1 (missed letter; the rest is unread)
 
@@ -202,13 +207,13 @@ kyori.rank('art', ['cart', 'artist', 'art'])
 // [
 //   { term: 'art',    score: 0 },
 //   { term: 'artist', score: 0 },
-//   { term: 'cart',   score: 5 }
+//   { term: 'cart',   score: 7 }
 // ]
 
 // The same order as one number per pair: distance + len/(len+1)
 kyori.rankKey('art', 'art')      // 0.75
 kyori.rankKey('art', 'artist')   // 0.857…
-kyori.rankKey('art', 'cart')     // 5.8
+kyori.rankKey('art', 'cart')     // 7.8
 ```
 
 ### KyoriIndex
@@ -225,9 +230,55 @@ index.search('art');
 // [
 //   { term: 'art',    score: 0 },
 //   { term: 'artist', score: 0 },
-//   { term: 'cart',   score: 5 }
+//   { term: 'cart',   score: 7 }
 // ]
 ```
+
+## Upgrading from 0.6.x
+
+0.7.0 changes the value `kyori.distance` returns, and so the order
+`kyori.rank`, `kyori.rankKey` and `KyoriIndex.search` give, for every pair
+the cost's last rule decides: a candidate that is not a typed-prefix
+completion of the query (and not the same words in another order). It is a
+breaking change to `distance()` for every caller, even though nothing is
+renamed, added or removed; `kyori.similarity` and every other method are
+unchanged.
+
+Until 0.6.x that rule charged a candidate the difference between its length
+and the query's, then each typed word's displacement, and a typo distance
+for a word it did not find. A completion that carried the typed words in
+another place cost more than an unrelated term of the right length:
+`pizza` against `margherita pizza` cost 22, and ranking a whole catalogue
+(the `KyoriIndex.search` job) put rephrased completions behind terms that
+merely began the same way. Measured on the held-out AmazonQAC sample in the
+research tree, where the prefix filter lost the intended completion to a
+typo, Kyori's mean reciprocal rank was 0.039 against 0.499 for a
+character-trigram cosine.
+
+0.7.0's last rule reads word overlap from the typed side: for each typed
+word, the fewest edits from it to a prefix of any word of the candidate
+(0 when a candidate word starts with it, at most its own length). The cost
+is a tier above every typed-prefix result, `1 + ⌊|q|/3⌋`, plus
+`|q| + 1` for each typed word the candidate lacks, plus the nearest lacking
+word's edits; the candidate's length never counts, and a candidate that
+lacks a typed word never passes one that extends the typed text. On the
+filtered pools the library is for, nothing moves (18 of 11 607 held-out
+cases change place among the rule-4 terms of their pool); over a whole
+catalogue the held-out MRR goes from 0.567 to 0.597, and on the typo
+regime from 0.365 to 0.583.
+
+| `distance(query, candidate)` | 0.6.x | 0.7.0 |
+|---|---|---|
+| `pizza` → `margherita pizza` | 22 | 2 |
+| `headphones for ipad kids` → `kids wireless headphones for ipad` | 71 | 9 |
+| `foo bar` → `foo` | 7 | 14 |
+| `art` → `cart` | 5 | 7 |
+| `ab` → `ax pens` | 6 | 5 |
+| `null` → `foo` | 3 | 1 |
+| `foo` → `food`, `fod` → `food`, `hotel bel-air` → `bel-air hotel` | 0, 1, 1 | 0, 1, 1 |
+
+The research tree's `versions/v8.md` has the change in full and
+`versions/algorithm.md` the rules as they now stand.
 
 ## Upgrading from 0.5.x
 

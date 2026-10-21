@@ -7,9 +7,10 @@ t.test('kyori/distance() tests', (t) => {
     t.equal(kyori.distance('foo', 'foo'), 0);
     // typed-prefix path: exact window match → 0 (unread 'd' not penalized)
     t.equal(kyori.distance('foo', 'food'), 0);
-    // infix / different first char → full length + token path
-    t.equal(kyori.distance('foo', 'ofoo'), 5);
-    t.equal(kyori.distance('foo bar', 'foo'), 7);
+    // not a typed prefix → the word path: a tier above every prefix match,
+    // then the typed words the candidate lacks, then the nearest one's edits
+    t.equal(kyori.distance('foo', 'ofoo'), 7);
+    t.equal(kyori.distance('foo bar', 'foo'), 14);
     t.equal(kyori.distance('café', 'cafe'), 0);
     t.equal(kyori.distance('naïve', 'naive'), 0);
     t.end();
@@ -37,7 +38,7 @@ t.test('kyori/distance() hyphens', (t) => {
 
 t.test('kyori/distance() prefix beats infix', (t) => {
     t.equal(kyori.distance('art', 'artist'), 0);
-    t.equal(kyori.distance('art', 'cart'), 5);
+    t.equal(kyori.distance('art', 'cart'), 7);
     t.ok(kyori.distance('art', 'artist') < kyori.distance('art', 'cart'));
     t.ok(kyori.distance('foo', 'food') < kyori.distance('foo', 'ofoo'));
     t.end();
@@ -70,18 +71,22 @@ t.test('kyori/distance() misplaced keywords', (t) => {
 t.test('kyori/distance() typos', (t) => {
     // same first char + longer candidate → typed-prefix window only
     t.equal(kyori.distance('fod', 'food'), 1);
-    t.equal(kyori.distance('fod', 'bar'), 3);
+    t.equal(kyori.distance('fod', 'bar'), 9);
     t.ok(kyori.distance('fod', 'food') < kyori.distance('fod', 'bar'));
-    t.equal(kyori.distance('ofo', 'foo'), 1);
+    // a typo in the first character is never a typed prefix; the word path
+    // charges one edit to the nearest word, in the tier above
+    t.equal(kyori.distance('ofo', 'foo'), 7);
     t.end();
 });
 
 
 t.test('kyori/distance() nil-test', (t) => {
     t.equal(kyori.distance(null, null), 0);
-    t.equal(kyori.distance(null, 'foo'), 3);
-    t.equal(kyori.distance('foo', null), 6);
-    t.equal(kyori.distance(undefined, 'foo'), 3);
+    // nothing typed: no word is lacking, so the word tier alone
+    t.equal(kyori.distance(null, 'foo'), 1);
+    // nothing to match: every typed word is lacking, at its own length
+    t.equal(kyori.distance('foo', null), 9);
+    t.equal(kyori.distance(undefined, 'foo'), 1);
     t.end();
 });
 
@@ -108,7 +113,7 @@ t.test('kyori/rank() orders by distance', (t) => {
     t.equal(ranked[1].term, 'artist');
     t.equal(ranked[1].score, 0);
     t.equal(ranked[2].term, 'cart');
-    t.equal(ranked[2].score, 5);
+    t.equal(ranked[2].score, 7);
     t.end();
 });
 
@@ -133,7 +138,7 @@ t.test('kyori/rank() breaks distance ties by length, shorter first', (t) => {
 t.test('kyori/rankKey() is distance plus a length term below 1', (t) => {
     t.equal(kyori.rankKey('foo', 'foo'), 0.75);
     t.equal(kyori.rankKey('foo', 'food'), 0.8);
-    t.equal(kyori.rankKey('foo', 'ofoo'), 5.8);
+    t.equal(kyori.rankKey('foo', 'ofoo'), 7.8);
     t.ok(kyori.rankKey('foo', 'foo') < kyori.rankKey('foo', 'food'));
     // a long exact completion (distance 0) still beats a short typo (distance 1)
     t.ok(kyori.rankKey('foo', 'food' + ' x'.repeat(100)) < kyori.rankKey('foo', 'fod'));
@@ -172,5 +177,56 @@ t.test('kyori/distance() no typo tolerance below three typed characters', (t) =>
     // from three characters on, one typo is allowed
     t.equal(kyori.distance('abc', 'abx pens'), 1);
     t.equal(kyori.distance('fod', 'food'), 1);
+    t.end();
+});
+
+
+t.test('kyori/distance() word overlap: the typed words the candidate lacks', (t) => {
+    // a later-word match costs the tier alone, never the candidate's length
+    t.equal(kyori.distance('pizza', 'margherita pizza'), 2);
+    t.equal(kyori.distance('pizza', 'pizza'), 0);
+    t.equal(kyori.distance('tennis s', 'black tennis skirt'), 3);
+    t.equal(kyori.distance('headphones for ipad kids', 'kids wireless headphones for ipad'), 9);
+    // the tier sits above every typed-prefix result: 1 + ⌊|q|/3⌋
+    t.equal(kyori.distance('ab', 'ax pens'), 5);
+    t.ok(kyori.distance('pizza', 'margherita pizza') > kyori.distance('pizza', 'pizzeria'));
+    t.ok(kyori.distance('pizzas', 'margherita pizza') > kyori.distance('pizzas', 'pizzeria x'));
+    // each lacking word costs more than any edit count can: |q| + 1
+    t.equal(kyori.distance('foo bar', 'foo'), 14);
+    t.equal(kyori.distance('foo bar', 'bar'), 14);
+    t.equal(kyori.distance('foo bar', 'qux'), 3 + 2 * 8 + 3);
+    // a typed word a candidate word starts with is not lacking
+    t.equal(kyori.distance('phone case', 'iphone 12 case'), 16);
+    t.equal(kyori.distance('case phone', 'phone cases'), 4);
+    // the nearest lacking word's edits order inside the count
+    t.equal(kyori.distance('art', 'cart'), 7);
+    t.equal(kyori.distance('art', 'bart'), 7);
+    t.ok(kyori.distance('art', 'cart') < kyori.distance('art', 'xyz'));
+    // a candidate with no words: every typed word at its own length
+    t.equal(kyori.distance('foo bar', ''), 3 + 2 * 8 + 3);
+    t.end();
+});
+
+
+t.test('kyori/distance() word overlap is read from the typed side', (t) => {
+    // not the Jaccard similarity: a word the candidate adds costs nothing
+    t.equal(kyori.distance('pizza', 'margherita pizza'), 2);
+    // (tier 6 for 16 typed characters, one lacking word at 17, 9 edits from
+    // 'margherita' to the nearest prefix of 'pizza')
+    t.equal(kyori.distance('margherita pizza', 'pizza'), 6 + 17 + 9);
+    t.equal(kyori.similarity('pizza', 'margherita pizza'), 0.5);
+    t.equal(kyori.similarity('margherita pizza', 'pizza'), 0.5);
+    t.end();
+});
+
+
+t.test('kyori/rank() a rule-4 candidate never passes a typed-prefix one', (t) => {
+    const ranked = kyori.rank('pizza', ['margherita pizza', 'pizza', 'pizzeria menu', 'pizaa stone', 'calzone']);
+
+    // 'pizaa stone' and 'pizzeria menu' are both one edit from a prefix
+    // (rule 3) and the shorter comes first; 'margherita pizza' sits in the
+    // tier above them; 'calzone' lacks the one typed word, 4 edits away
+    t.strictSame(ranked.map((r) => r.term), ['pizza', 'pizaa stone', 'pizzeria menu', 'margherita pizza', 'calzone']);
+    t.strictSame(ranked.map((r) => r.score), [0, 1, 1, 2, 2 + 6 + 4]);
     t.end();
 });
