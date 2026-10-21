@@ -44,11 +44,14 @@ t.test('indices/KyoriIndex search ranks by kyori score', (t) => {
     t.equal(ranked[0].score, 0);
     t.equal(ranked[1].term, 'food');
     t.equal(ranked[1].score, 0);
-    t.equal(ranked[2].term, 'bar');
-    t.equal(ranked[3].term, 'afoo');
-    t.equal(ranked[3].score, 5);
-    t.equal(ranked[4].term, 'ofoo');
-    t.equal(ranked[4].score, 5);
+    // the typed word inside a candidate word costs one edit; an unrelated
+    // word its whole length
+    t.equal(ranked[2].term, 'afoo');
+    t.equal(ranked[2].score, 7);
+    t.equal(ranked[3].term, 'ofoo');
+    t.equal(ranked[3].score, 7);
+    t.equal(ranked[4].term, 'bar');
+    t.equal(ranked[4].score, 9);
     t.end();
 });
 
