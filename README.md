@@ -58,7 +58,7 @@ Edit-distance family (native):
 Similarity / ranking family (native):
 
 * **Jaro-Winkler**: short-string resemblance (names); higher similarity is better.
-* **Kyori**: token-sensitive **ranking** cost for autocomplete. Matching is case-insensitive, folds Latin diacritics, treats hyphens as spaces, charges a flat 1 for the same keywords in a different order, for typed-prefix completions charges only the edits between what was typed and the closest prefix of the candidate (prefix edit distance, first character fixed, typos tolerated from the third typed character on), and for everything else counts the typed words the candidate lacks — a word is lacking when no word of the candidate starts with it, a typo away — ranked below every typed-prefix completion, so a candidate's length never counts against it. Use **`kyori.distance`** / **`kyori.rank`** for ordering (**lower** distance is better); `rank` sorts by distance, then by length (shorter completion first), then alphabetically, and **`kyori.rankKey`** is that order as one number. Use **`kyori.similarity`** for pairwise token Jaccard (**higher** is better).
+* **Kyori**: token-sensitive **ranking** cost for autocomplete. Matching is case-insensitive, folds Latin diacritics, treats hyphens as spaces, charges a flat 1 for the same keywords in a different order, for typed-prefix completions charges only the edits between what was typed and the closest prefix of the candidate (prefix edit distance, first character fixed, typos tolerated from the third typed character on), and for everything else counts the typed words the candidate lacks — a word is lacking when no word of the candidate starts with it, a typo away — ranked below every typed-prefix completion, so a candidate's length never counts against it. Use **`kyori.distance`** / **`kyori.rank`** for ordering (**lower** distance is better); `rank` sorts by distance, then by length (shorter completion first), then alphabetically, and **`kyori.rankKey`** is that order as one number. Use **`kyori.similarity`** for pairwise word resemblance — Jaccard over words, a word that starts a word of the other string sharing the part it covers (**higher** is better).
 
 ## Usage
 
@@ -169,10 +169,13 @@ kyori.distance('foo bar', 'foo')                      // 14 (one typed word lack
 kyori.distance('fod', 'food')                         // 1 (typed-prefix typo)
 kyori.distance('dishwaher', 'dishwasher pods')       // 1 (missed letter; the rest is unread)
 
-// Pairwise resemblance — higher is better (token Jaccard after fold)
+// Pairwise resemblance — higher is better (word Jaccard after fold,
+// a word that starts another sharing the part it covers)
 kyori.similarity('hotel bel-air', 'bel-air hotel')    // 1
 kyori.similarity('foo', 'Foo Bar')                    // 0.5
-kyori.similarity('foo', 'food')                       // 0
+kyori.similarity('foo', 'food')                       // 0.6 (0.75 shared of 1.25)
+kyori.similarity('chore li', 'chore list for wall')   // 0.333… (1.5 shared of 4.5)
+kyori.similarity('art', 'cart')                       // 0 (only a word's start counts)
 
 // Order a candidate pool: by distance, then shorter first (scores are the distances)
 kyori.rank('art', ['cart', 'artist', 'art'])
@@ -205,6 +208,28 @@ index.search('art');
 //   { term: 'cart',   score: 7 }
 // ]
 ```
+
+## Upgrading from 0.7.x
+
+0.8.0 changes the value `kyori.similarity` returns for every pair where a
+word of one string starts a word of the other without being equal to it:
+until 0.7.x such words shared nothing (`similarity('foo', 'food')` was 0),
+and now the shorter one shares the part of the longer one it covers (0.75
+of `food`, so 0.6). Equal words are matched first; the rest are matched
+one to one, choosing the pairs that share the most in total; only a word's
+start counts, never its middle or a typo.
+Every other pair keeps its value, the result is still in [0, 1], 1 still
+means the same words, and it is still symmetric. `kyori.distance`,
+`kyori.rank`, `kyori.rankKey`, `KyoriIndex` and every other method are
+unchanged.
+
+Code that sorted by `kyori.similarity` or compared it with a threshold will
+see higher values where words are abbreviated or cut short. On the
+entity-matching suites the change raised mean reciprocal rank from 0.878 to
+0.893 (Abt–Buy 0.728 → 0.773, Amazon–Google 0.785 → 0.800). It costs about
+1.2× 0.7.0's time on those pairs; words that start one another are matched
+in time cubic in their number, so a pair with hundreds of such words a side
+takes milliseconds.
 
 ## Upgrading from 0.6.x
 
