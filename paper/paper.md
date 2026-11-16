@@ -17,7 +17,7 @@ authors:
 affiliations:
   - name: Wizhut, Athens, Greece
     index: 1
-date: 21 October 2026
+date: 16 November 2026
 bibliography: paper.bib
 ---
 
@@ -36,7 +36,7 @@ rephrased completion by the typed words it lacks, and breaks ties by length, sho
 three functions, `similarity`, `distance` and `rank`. The library
 is published on npm as `@wizhut_tech/kyori` under the MIT licence,
 runs on Node.js 14.13 or later with one runtime dependency, and ships
-with 427 test assertions.
+with 444 test assertions.
 
 # Statement of need
 
@@ -106,10 +106,12 @@ two derives the other, and ineligible input (Hamming on unequal lengths)
 sorts last; Kyori's own method refuses the derivation. Its cost is not a
 metric (`distance('foo bar', 'foo')` is 14 and the reverse is 0) and it is 0
 for every candidate that begins with the typed text, so no similarity can
-be read off it; its `similarity` is instead the Jaccard index
-of the two folded word sets. Uniform names let a caller sort by the wrong
-function; the evaluation keeps that row, 0.13 of mean reciprocal rank (MRR) below
-the cost.
+be read off it; its `similarity` is instead a Jaccard index
+of the folded word sets in which, since 0.8.0, a word starting a word of
+the other counts for the share it covers (`li` half of `list`), matched as
+in Fast-Join [@wang2011]. Uniform names let
+callers sort by the wrong function; the evaluation keeps that row, 0.03 of
+mean reciprocal rank (MRR) below `rank`.
 
 ![The method interface and its implementations.\label{fig:api}](api.png)
 
@@ -155,13 +157,12 @@ built so the rules decide, ranking the whole catalogue rises from 0.567 to
 typo from 0.365 to 0.583, 0.030 behind a character-trigram cosine, each
 gap confirmed once on the test split.
 The design lost elsewhere: as a resemblance
-score on product titles Kyori's token Jaccard trails a character-trigram
-cosine by 0.172 on Abt–Buy [@koepcke2010] and Soft-TFIDF by 0.063 on
+score on product titles Kyori's word share trails a character-trigram
+cosine by 0.127 on Abt–Buy [@koepcke2010] and Soft-TFIDF by 0.048 on
 Amazon–Google [@cohen2003]; on misspellings [@norvig2009] its
-cost trails Jaro–Winkler by 0.039; and it is slow: 52 µs a query at the
-median on 0.6.0 (0.5.1 took 120; 0.7.0 is not timed again), against 19 to
-27 µs for fuzzysort and sorting by length on one core of an Apple M4 Max
-under Node.js 26.8. On a filtered list a cost of known parts orders as well
+cost trails Jaro–Winkler by 0.039; and it is slow: 50 µs a query at the
+median on 0.8.0 (0.5.1 took 120), against 19 to 27 µs for fuzzysort and
+sorting by length on one core of an Apple M4 Max under Node.js 26.13. On a filtered list a cost of known parts orders as well
 as what applications already use, no better and more slowly, and
 popularity decides what remains; the fourth rule matters only where the
 filter has not.
@@ -183,16 +184,16 @@ available only to the most popular completion.
 | `LIKE 'q%' ORDER BY length`     | 0.403 | 0.385–0.441 |  50% |
 | Fuse.js 7.5                     | 0.402 | 0.355–0.499 |  66% |
 | match-sorter 8.3                | 0.376 | 0.276–0.942 |  82% |
+| Kyori `similarity` as key       | 0.372 | 0.339–0.436 |  61% |
 | Kyori cost without tie-break    | 0.368 | 0.257–0.989 |  85% |
 | Character-trigram cosine        | 0.365 | 0.364–0.411 |  15% |
 | Jaro–Winkler                    | 0.353 | 0.343–0.365 |  48% |
-| Kyori `similarity` as key       | 0.271 | 0.210–0.706 |  82% |
 | Damerau–Levenshtein             | 0.257 | 0.245–0.272 |  64% |
 
 # Research impact statement
 
 The evidence of use is the author's own research. The library has
-been on npm since October 2024, through 23 versions to 0.7.0, with about
+been on npm since October 2024, through 24 versions to 0.8.0, with about
 860 registry downloads in the month to 20 October 2026; the repository
 has been public since September 2024 with its tests run on every push,
 one author and no external contributors yet. Each of the method's eight
