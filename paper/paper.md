@@ -151,7 +151,7 @@ is level with fuzzysort, Fuse.js and sorting by length, no difference
 surviving Holm correction; it leads match-sorter by
 0.028 and its own cost without the tie-break by 0.036 (both $p < 0.01$),
 and trails the most popular completion by 0.018. The fourth rule
-moves nothing there (0.404 before and after 0.7.0); on held-out groups
+moves nothing there; on held-out groups
 built so the rules decide, ranking the whole catalogue rises from 0.567 to
 0.597, past Fuse.js at 0.579, and the queries the prefix filter lost to a
 typo from 0.365 to 0.583, 0.030 behind a character-trigram cosine, each
@@ -159,10 +159,11 @@ gap confirmed once on the test split.
 The design lost elsewhere: as a resemblance
 score on product titles Kyori's word share trails a character-trigram
 cosine by 0.127 on Abt–Buy [@koepcke2010] and Soft-TFIDF by 0.048 on
-Amazon–Google [@cohen2003]; on misspellings [@norvig2009] its
+Amazon–Google [@cohen2003]; on rephrased queries its similarity beats
+its cost (0.623 against 0.599); on misspellings [@norvig2009] its
 cost trails Jaro–Winkler by 0.039; and it is slow: 50 µs a query at the
-median on 0.8.0 (0.5.1 took 120), against 19 to 27 µs for fuzzysort and
-sorting by length on one core of an Apple M4 Max under Node.js 26.13. On a filtered list a cost of known parts orders as well
+median on 0.8.0, against 19 to 27 µs for fuzzysort and sorting by length
+on one Apple M4 Max core, Node.js 26.13. On a filtered list a cost of known parts orders as well
 as what applications already use, no better and more slowly, and
 popularity decides what remains; the fourth rule matters only where the
 filter has not.
