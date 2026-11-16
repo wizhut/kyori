@@ -96,11 +96,121 @@ t.test('kyori/similarity() token Jaccard resemblance', (t) => {
     t.equal(kyori.similarity('foo', 'foo'), 1);
     t.equal(kyori.similarity('hotel bel-air', 'bel-air hotel'), 1);
     t.equal(kyori.similarity('foo bar', 'bar foo'), 1);
-    t.equal(kyori.similarity('foo', 'food'), 0);
     t.equal(kyori.similarity('foo', 'Foo Bar'), 0.5);
     t.equal(kyori.similarity('café', 'cafe'), 1);
     t.equal(kyori.similarity(null, null), 1);
     t.equal(kyori.similarity(null, 'foo'), 0);
+    t.end();
+});
+
+
+t.test('kyori/similarity() credits a word that starts a word of the other side', (t) => {
+    // the share of the longer word the shorter one covers
+    t.equal(kyori.similarity('foo', 'food'), 0.75 / 1.25);
+    t.equal(kyori.similarity('food', 'foo'), 0.75 / 1.25);
+    // a half-typed last word: chore 1 + li/list 0.5 over 2 + 4 − 1.5 words
+    t.equal(kyori.similarity('chore li', 'chore list for wall'), 1.5 / 4.5);
+    t.equal(kyori.similarity('chore list for wall', 'chore li'), 1.5 / 4.5);
+    // only a start counts: not a word inside, not a typo
+    t.equal(kyori.similarity('art', 'cart'), 0);
+    t.equal(kyori.similarity('fod', 'food'), 0);
+    t.equal(kyori.similarity('abc', 'abd'), 0);
+    // an exact word is matched before any prefix credit
+    t.equal(kyori.similarity('list li', 'list'), 0.5);
+    t.end();
+});
+
+
+t.test('kyori/similarity() matches each word once, for the largest total, the same from either side', (t) => {
+    // li could start list or lion (0.5 each): one of them, not both
+    t.equal(kyori.similarity('li', 'list lion'), 0.5 / 2.5);
+    t.equal(kyori.similarity('list lion', 'li'), 0.5 / 2.5);
+    // abc/abcd 0.75 + a/ab 0.5 beats abc/ab 2/3 + a/abcd 0.25
+    t.equal(kyori.similarity('a abc', 'ab abcd'), 1.25 / 2.75);
+    t.equal(kyori.similarity('ab abcd', 'a abc'), 1.25 / 2.75);
+    // b/ba alone would block both other pairs; b/bb + ba/baaa share 1
+    t.equal(kyori.similarity('ba bb', 'b baaa'), 1 / 3);
+    t.equal(kyori.similarity('b baaa', 'ba bb'), 1 / 3);
+    // equal word counts on both sides, in both alphabetical orders
+    t.equal(kyori.similarity('ab cd', 'abcd cdab'), 1 / 3);
+    t.equal(kyori.similarity('xa xb', 'xaaa xbbb'), 1 / 3);
+    t.equal(kyori.similarity('xaaa xbbb', 'xa xb'), 1 / 3);
+    t.end();
+});
+
+
+t.test('kyori/similarity() properties on seeded random strings', (t) => {
+    // small alphabets, so that words often start one another
+    let seed = 20261116;
+    const random = () => {
+        seed = (seed + 0x6D2B79F5) | 0;
+        let x = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+        x = (x + Math.imul(x ^ (x >>> 7), 61 | x)) ^ x;
+        return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
+    };
+    const word = (alphabet) => {
+        let w = '';
+        const n = 1 + Math.floor(random() * 4);
+
+        for (let i = 0; i < n; i++) {
+            w += alphabet[Math.floor(random() * alphabet.length)];
+        }
+
+        return w;
+    };
+    const phrase = (alphabet) => Array.from({ length: 1 + Math.floor(random() * 6) }, () => word(alphabet)).join(' ');
+    const words = (s) => [...new Set(s.split(' '))];
+    const credit = (x, y) => {
+        const [short, long] = x.length <= y.length ? [x, y] : [y, x];
+
+        return x !== y && long.startsWith(short) ? short.length / long.length : 0;
+    };
+    // the best one-to-one matching, by trying every one
+    const best = (left, right) => {
+        if (left.length === 0) {
+            return 0;
+        }
+
+        const [head, ...rest] = left;
+        let top = best(rest, right);
+
+        right.forEach((y, j) => {
+            const c = credit(head, y);
+
+            if (c > 0) {
+                top = Math.max(top, c + best(rest, right.filter((_, k) => k !== j)));
+            }
+        });
+
+        return top;
+    };
+    let failures = 0;
+
+    for (const alphabet of ['ab', 'abc', 'abcdef']) {
+        for (let i = 0; i < 4000; i++) {
+            const a = phrase(alphabet);
+            const b = phrase(alphabet);
+            const s = kyori.similarity(a, b);
+            const A = words(a);
+            const B = words(b);
+            const exact = A.filter((w) => B.includes(w)).length;
+            const jaccard = exact / (A.length + B.length - exact);
+            const share = best(A.filter((w) => !B.includes(w)), B.filter((w) => !A.includes(w)));
+            const expected = (exact + share) / (A.length + B.length - exact - share);
+            const ok = s === kyori.similarity(b, a) &&
+                s >= jaccard && s <= 1 &&
+                (s === 1) === (jaccard === 1) &&
+                Math.abs(s - expected) < 1e-12 &&
+                (share > 0 || s === jaccard);
+
+            if (!ok) {
+                failures += 1;
+                t.fail(`${a} / ${b}: ${s}, expected ${expected}`);
+            }
+        }
+    }
+
+    t.equal(failures, 0, 'symmetric, in [Jaccard, 1], 1 only for the same words, the best matching');
     t.end();
 });
 

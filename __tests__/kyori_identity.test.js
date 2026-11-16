@@ -10,15 +10,17 @@ const { tokenizeTerm } = require('../src/common/tokenize.js');
 // (ligatures, eszett, stroked o, diacritics, en and em dashes, a non-Latin
 // script) and null / undefined. 0.6.0 folded each string once per call and
 // kept every 0.5.1 value; 0.7.0 changed rule 4 of the cost, so the pairs
-// rule 4 decides carry 0.7.0's values, each with 0.6.0's in a comment. A
-// later version that changes any of them has changed the method.
+// rule 4 decides carry 0.7.0's values, each with 0.6.0's in a comment.
+// 0.8.0 gave similarity() prefix credit, so the pairs where one word starts
+// another carry 0.8.0's similarity, with 0.7.0's in a comment. A later
+// version that changes any of them has changed the method.
 const PAIRS = [
     // [query, candidate, distance, similarity, rankKey]
-    ['foo', 'food', 0, 0, 0.8],
+    ['foo', 'food', 0, 0.6, 0.8], // similarity 0.7.0: 0
     ['fod', 'food', 1, 0, 1.8],
     ['chore lo', 'chore list for wall', 1, 0.2, 1.95],
     ['dishwaher', 'dishwasher pods', 1, 0, 1.9375],
-    ['food', 'foo', 1, 0, 1.75],
+    ['food', 'foo', 1, 0.6, 1.75], // similarity 0.7.0: 0
     // transpositions inside the typed prefix: one OSA edit
     ['teh', 'the', 1, 0, 1.75],
     ['fodo', 'food', 1, 0, 1.8],
@@ -41,7 +43,7 @@ const PAIRS = [
     ['München', 'munchen', 0, 1, 0.875],
     ['Œuf', 'oeuf', 0, 1, 0.8],
     ['smørrebrød', 'smorrebrod', 0, 1, 0.9090909090909091],
-    ['straße', 'str', 15, 0, 15.75], // 0.6.0: 8
+    ['straße', 'str', 15, 0.2727272727272727, 15.75], // 0.6.0: 8; similarity 0.7.0: 0
     ['bel–air', 'bel—air hotel', 0, 0.6666666666666666, 0.9285714285714286],
     ['距離 sushi', 'sushi', 14, 0.5, 14.833333333333334], // 0.6.0: 8
     [undefined, undefined, 0, 1, 0],

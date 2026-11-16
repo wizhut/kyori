@@ -238,8 +238,147 @@ function wordOverlapCost(termTokens, textTokens, termLength, tier) {
 
 
 /**
- * Token-set Jaccard resemblance of two prepared strings. Higher is better
- * (1 = identical bags). Measures pairwise similarity, not autocomplete ranking
+ * The share of the longer word that the shorter one covers when it starts it
+ * (`li` / `list` = 0.5), else 0. The two words differ.
+ */
+function prefixCredit(a, b) {
+    if (a.length < b.length) {
+        return b.startsWith(a) ? a.length / b.length : 0;
+    }
+
+    return a.startsWith(b) ? b.length / a.length : 0;
+}
+
+
+/**
+ * The largest total of a one-to-one assignment of rows to columns (rows ≤
+ * columns, weights ≥ 0): the Hungarian method, O(rows² · columns).
+ */
+function maxAssignment(weights) {
+    const rows = weights.length;
+    const cols = weights[0].length;
+    const u = new Array(rows + 1).fill(0);
+    const v = new Array(cols + 1).fill(0);
+    const owner = new Array(cols + 1).fill(0);
+    const way = new Array(cols + 1).fill(0);
+
+    for (let i = 1; i <= rows; i++) {
+        const minv = new Array(cols + 1).fill(Infinity);
+        const used = new Array(cols + 1).fill(false);
+        let j0 = 0;
+
+        owner[0] = i;
+
+        do {
+            const i0 = owner[j0];
+            let delta = Infinity;
+            let j1 = 0;
+
+            used[j0] = true;
+
+            for (let j = 1; j <= cols; j++) {
+                if (!used[j]) {
+                    const reduced = -weights[i0 - 1][j - 1] - u[i0] - v[j];
+
+                    if (reduced < minv[j]) {
+                        minv[j] = reduced;
+                        way[j] = j0;
+                    }
+
+                    if (minv[j] < delta) {
+                        delta = minv[j];
+                        j1 = j;
+                    }
+                }
+            }
+
+            for (let j = 0; j <= cols; j++) {
+                if (used[j]) {
+                    u[owner[j]] += delta;
+                    v[j] -= delta;
+                } else {
+                    minv[j] -= delta;
+                }
+            }
+
+            j0 = j1;
+        } while (owner[j0] !== 0);
+
+        do {
+            const j1 = way[j0];
+
+            owner[j0] = owner[j1];
+            j0 = j1;
+        } while (j0 !== 0);
+    }
+
+    let total = 0;
+
+    for (let j = 1; j <= cols; j++) {
+        if (owner[j] !== 0) {
+            total += weights[owner[j] - 1][j - 1];
+        }
+    }
+
+    return total;
+}
+
+
+/**
+ * The credit the words each side has alone earn by starting a word of the
+ * other side, each word matched at most once and the matching chosen to make
+ * the total as large as possible. Only words with some credit take part, and
+ * they are put in one order whichever side they came from, so the result is
+ * the same both ways, to the last bit. The two lists share no word.
+ */
+function prefixShare(onlyA, onlyB) {
+    let inA = null;
+    let inB = null;
+    let top = 0;
+
+    for (const x of onlyA) {
+        for (const y of onlyB) {
+            // a word that starts another shares its first character
+            const credit = x.charCodeAt(0) === y.charCodeAt(0) ? prefixCredit(x, y) : 0;
+
+            if (credit > 0) {
+                if (inA === null) {
+                    inA = new Set();
+                    inB = new Set();
+                }
+
+                inA.add(x);
+                inB.add(y);
+                top = Math.max(top, credit);
+            }
+        }
+    }
+
+    if (inA === null) {
+        return 0;
+    }
+
+    // one word with credit on either side: the matching is its best pair
+    if (inA.size === 1 || inB.size === 1) {
+        return top;
+    }
+
+    const a = [...inA].sort();
+    const b = [...inB].sort();
+    const aFirst = a.length < b.length || (a.length === b.length && a.join(' ') < b.join(' '));
+    const rows = aFirst ? a : b;
+    const cols = aFirst ? b : a;
+
+    return maxAssignment(rows.map((x) => cols.map((y) => prefixCredit(x, y))));
+}
+
+
+/**
+ * Word-set Jaccard resemblance of two prepared strings, where a word that
+ * starts a word of the other side shares the part of it that it covers: a
+ * half-typed word counts for what was typed (`chore li` / `chore list for
+ * wall` = 1.5 shared of 4.5 = 1/3). Higher is better (1 = identical word
+ * sets). Symmetric; measures pairwise similarity, not autocomplete ranking
  * cost.
  */
 function similarityPrepared(term, text) {
@@ -256,15 +395,27 @@ function similarityPrepared(term, text) {
 
     const setA = new Set(termTokens);
     const setB = new Set(textTokens);
-    let inter = 0;
+    const onlyA = [];
+    const onlyB = [];
+    let shared = 0;
 
     for (const token of setA) {
         if (setB.has(token)) {
-            inter += 1;
+            shared += 1;
+        } else {
+            onlyA.push(token);
         }
     }
 
-    return inter / (setA.size + setB.size - inter);
+    for (const token of setB) {
+        if (!setA.has(token)) {
+            onlyB.push(token);
+        }
+    }
+
+    shared += prefixShare(onlyA, onlyB);
+
+    return shared / (setA.size + setB.size - shared);
 }
 
 

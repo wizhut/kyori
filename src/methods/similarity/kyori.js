@@ -17,8 +17,10 @@ function fn_distance(terms, text) {
 
 
 /**
- * Token-set Jaccard resemblance after fold. Higher is better (1 = identical bags).
- * Measures pairwise similarity, not autocomplete ranking cost.
+ * Word-set Jaccard resemblance after fold, where a word that starts a word of
+ * the other side shares the part of it that it covers (0.8.0). Higher is
+ * better (1 = identical word sets). Symmetric; measures pairwise similarity,
+ * not autocomplete ranking cost.
  */
 function fn_similarity(terms, text) {
     return similarityPrepared(prepare(terms), prepare(text));
